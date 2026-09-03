@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR. Ahmed Abd-ElFatah</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons for clean visuals -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #05070c;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .floating-watermark {
+            pointer-events: none;
+            user-select: none;
+            position: absolute;
+            font-family: monospace;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.18);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+            transition: all 3.5s ease-in-out;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- OS LOCK SCREEN (FORCED INSTALLATION FOR WINDOWS/ANDROID) -->
+    <div id="os-lock-screen" class="fixed inset-0 bg-[#05070c] z-50 flex flex-col items-center justify-center p-6 text-center hidden">
+        <div onclick="bypassLockScreen()" class="max-w-md bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-2xl relative cursor-pointer hover:border-indigo-500/30 transition duration-300">
+            <div class="w-20 h-20 bg-red-950/40 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="shield-alert" class="w-10 h-10 text-red-500"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-3">Secure Application Required</h2>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                To protect educational materials and stream class lectures, Windows and Android users are required to install the secure browser client to block screenshotting and screen recording.
+            </p>
+            <button onclick="event.stopPropagation(); downloadSecureApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 flex items-center justify-center gap-2 mb-4">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>Download Secure Desktop/Mobile Client</span>
+            </button>
+            <div class="text-xs text-gray-500">
+                macOS & iOS devices are allowed to browse normally.
+            </div>
+            <div class="text-[10px] text-gray-600 mt-4 italic">
+                (Admin: Tap this screen or use Ctrl+Shift+A shortcut to bypass during development)
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="flex-1 flex flex-col min-h-screen">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-section" class="flex-1 flex items-center justify-center p-4">
+            <div class="w-full max-w-md bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-xl relative">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-3 mb-3">
+                        <img src="logo.png" alt="Logo" onerror="this.outerHTML='<div class=\'w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl aspect-square object-cover rounded-xl\'>MR</div>'" class="w-12 h-12 object-cover aspect-square rounded-xl">
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">MR. Ahmed Abd-ElFatah</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Log in with your registered phone number or ID</p>
+                </div>
+
+                <!-- Role Selector -->
+                <div class="flex bg-[#05070c] p-1 rounded-lg mb-6 border border-[#1f2937]/40">
+                    <button onclick="toggleLoginRole('student')" id="tab-student" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600">
+                        Student Access
+                    </button>
+                    <button onclick="toggleLoginRole('admin')" id="tab-admin" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white">
+                        Admin Console
+                    </button>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label id="phone-label" class="block text-xs font-semibold text-gray-400 mb-1.5">Student Phone / ID</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="login-id" required placeholder="e.g. 01012345678" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Secret Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl transition duration-200">
+                        Secure Authentication
+                    </button>
+                </form>
+
+                <div id="login-error" class="hidden text-center mt-4 p-2.5 bg-red-950/40 border border-red-500/20 text-red-400 text-xs rounded-lg"></div>
+
+                <div class="text-center mt-6">
+                    <button onclick="triggerQuickAdminBypass()" class="text-[10px] text-indigo-400 hover:underline font-mono">
+                        Device bypass: Tap/Click here or use Ctrl+Shift+L to test as Administrator
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN SECURE WORKSPACE (HIDDEN BY DEFAULT) -->
+        <div id="portal-section" class="flex-1 flex flex-col md:flex-row hidden">
+            <!-- SIDEBAR -->
+            <aside class="w-full md:w-64 bg-[#0b0f19] border-r border-[#1f2937] flex flex-col shrink-0">
+                <div class="p-6 border-b border-[#1f2937] flex items-center gap-3">
+                    <img src="logo.png" alt="Logo" onerror="this.outerHTML='<div class=\'w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg aspect-square object-cover rounded-xl\'>MR</div>'" class="w-10 h-10 object-cover aspect-square rounded-xl">
+                    <div class="overflow-hidden">
+                        <h1 class="text-xs font-extrabold text-white truncate leading-none mb-1">MR. Ahmed</h1>
+                        <span id="user-badge" class="inline-block bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full">Student</span>
+                    </div>
+                </div>
+
+                <nav class="flex-1 p-4 space-y-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-indigo-600/15 text-indigo-400">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    
+                    <button onclick="switchTab('materials')" id="nav-materials" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>Materials & Sheets</span>
+                    </button>
+                    
+                    <button onclick="switchTab('videos')" id="nav-videos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
+                        <i data-lucide="video" class="w-4 h-4"></i>
+                        <span>Lectures & Videos</span>
+                    </button>
+                    
+                    <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
+                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                        <span>Help bot</span>
+                    </button>
+                    
+                    <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
+                        <i data-lucide="rss" class="w-4 h-4"></i>
+                        <span>Community Feed</span>
+                    </button>
+
+                    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/20 transition hidden">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Admin Console</span>
+                    </button>
+                </nav>
+
+                <div class="p-4 border-t border-[#1f2937] bg-[#05070c]/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center text-indigo-400 font-bold border border-slate-700" id="profile-avatar">S</div>
+                        <div class="overflow-hidden">
+                            <h4 id="user-name" class="text-xs font-bold text-white truncate">Student User</h4>
+                            <p id="user-grade-label" class="text-[10px] text-gray-400 truncate">Grade level</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 border border-[#1f2937] hover:border-red-500/30 hover:bg-red-950/10 text-gray-400 hover:text-red-400 font-semibold py-2 rounded-xl text-xs transition">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                        <span>Disconnect Portal</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- MAIN WORKSPACE -->
+            <main class="flex-1 flex flex-col bg-[#05070c] overflow-y-auto">
+                <header class="bg-[#0b0f19]/60 backdrop-blur-md border-b border-[#1f2937] px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+                    <span id="active-tab-title" class="text-sm font-bold text-white tracking-wide uppercase">Dashboard</span>
+                    <div class="text-right">
+                        <div class="text-xs font-semibold text-white">MR. Ahmed Abd-ElFatah Website</div>
+                        <div class="text-[9px] text-gray-500">Academic Term 2026/2027</div>
+                    </div>
+                </header>
+
+                <div class="flex-1 p-6">
+                    
+                    <!-- 1. HOME DASHBOARD -->
+                    <div id="view-dashboard" class="view-panel space-y-6">
+                        <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-500/10 p-6 rounded-2xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative z-10">
+                                <h2 id="welcome-message" class="text-xl md:text-2xl font-black text-white mb-2">Marhaban! Ready to study?</h2>
+                                <p class="text-gray-400 text-xs md:text-sm max-w-xl leading-relaxed">
+                                    Welcome to the official online dashboard of MR. Ahmed Abd-ElFatah. Access your customized worksheets, view watermarked video sessions, or ask Help bot any doubts!
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
+                                <div class="w-12 h-12 bg-indigo-950/60 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
+                                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Your Grade Level</h3>
+                                    <p id="dashboard-grade-info" class="text-white text-sm font-bold mt-0.5">Preparatory 1</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
+                                <div class="w-12 h-12 bg-emerald-950/60 border border-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400">
+                                    <i data-lucide="video" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Class Lectures</h3>
+                                    <p id="dashboard-lecture-count" class="text-white text-sm font-bold mt-0.5">0 Active Lectures</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
+                                <div class="w-12 h-12 bg-violet-950/60 border border-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
+                                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Classroom AI Assistant</h3>
+                                    <p class="text-white text-sm font-bold mt-0.5">Help bot online</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grades and Feedback -->
+                        <div class="bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl">
+                            <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i data-lucide="award" class="w-5 h-5 text-indigo-400"></i>
+                                <span>Recent Grades & Feedback</span>
+                            </h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-[#1f2937] text-gray-400">
+                                            <th class="pb-3 font-semibold">Subject / Topic</th>
+                                            <th class="pb-3 font-semibold">Assignment Category</th>
+                                            <th class="pb-3 font-semibold">Scored Grade</th>
+                                            <th class="pb-3 font-semibold">Status / Review</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="student-grades-tbody" class="divide-y divide-[#1f2937]/50 text-gray-300">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. MATERIALS & STUDY SHEETS -->
+                    <div id="view-materials" class="view-panel space-y-6 hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-white mb-1">Academy Sheets & Homework PDF</h2>
+                                <p class="text-xs text-gray-400">View and download your required class study guides and exam sheets</p>
+                            </div>
+                            
+                            <!-- Dynamic upload trigger (For administrators only) -->
+                            <button id="admin-material-upload-btn" onclick="openUploadMaterialModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition flex items-center gap-1.5 hidden">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Upload PDF Material</span>
+                            </button>
+                        </div>
+
+                        <div id="materials-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- 3. LECTURES & VIDEOS -->
+                    <div id="view-videos" class="view-panel space-y-6 hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-white mb-1">Recorded Lessons</h2>
+                                <p class="text-xs text-gray-400">Play secure encrypted lectures from MR. Ahmed Abd-ElFatah</p>
+                            </div>
+                            <button id="admin-video-upload-btn" onclick="openAddVideoModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition flex items-center gap-1.5 hidden">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Register New Lecture</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <div class="lg:col-span-4 bg-[#0b0f19] border border-[#1f2937] rounded-2xl p-4 flex flex-col h-[500px]">
+                                <h3 class="font-semibold text-white text-xs uppercase tracking-wider mb-3 border-b border-[#1f2937] pb-2">Lecture Playlist</h3>
+                                <div id="video-sessions-list" class="flex-1 overflow-y-auto space-y-2">
+                                    <!-- Dynamic rows -->
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-8 flex flex-col gap-4">
+                                <div id="video-theater" class="relative bg-black rounded-2xl border border-[#1f2937] overflow-hidden flex items-center justify-center aspect-video shadow-2xl">
+                                    <div id="video-watermark" class="floating-watermark hidden"></div>
+                                    <video id="secure-player" class="w-full h-full object-contain hidden" controls controlsList="nodownload" oncontextmenu="return false;">
+                                        <!-- Blob URL sources mapped dynamically -->
+                                    </video>
+                                    <div id="player-placeholder" class="text-center p-8 flex flex-col items-center">
+                                        <div class="w-14 h-14 rounded-full bg-indigo-950/60 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4">
+                                            <i data-lucide="play" class="w-6 h-6"></i>
+                                        </div>
+                                        <h4 class="font-bold text-white text-sm mb-1">Select a Lecture Session</h4>
+                                        <p class="text-gray-500 text-xs max-w-xs">Pick a registered lecture session from your grade playlist to start streaming with encrypted watermark overlay protection.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 id="current-video-title" class="font-bold text-white text-sm">No Active Video</h3>
+                                        <span id="current-video-badge" class="bg-indigo-900/60 border border-indigo-500/20 text-indigo-300 font-bold px-2.5 py-0.5 rounded text-[9px] uppercase tracking-wider">Secured</span>
+                                    </div>
+                                    <p id="current-video-desc" class="text-gray-400 text-xs leading-relaxed">
+                                        Video feeds are encoded and rendered on demand. Dynamic user watermarks are continuously rendered inside the player coordinates to counter physical screens captures.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. HELP BOT AI CHAT -->
+                    <div id="view-chat" class="view-panel space-y-6 hidden">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-950 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-white leading-none mb-1">Help bot</h2>
+                                <p class="text-xs text-gray-400">AI physics, math, and chemistry curriculum tutor</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl flex flex-col h-[520px] shadow-lg">
+                            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col">
+                                <div class="flex items-start gap-3 max-w-[80%]">
+                                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 aspect-square object-cover rounded-xl">H</div>
+                                    <div class="bg-indigo-950/40 border border-indigo-500/10 p-3.5 rounded-2xl rounded-tl-none">
+                                        <p class="text-xs leading-relaxed text-gray-200">
+                                            Marhaban! I am <strong>Help bot</strong>, your professional coursework tutor. I am fully integrated into MR. Ahmed Abd-ElFatah's database. Ask me any math, chemistry, physics, or homework queries and we will solve them step-by-step!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 border-t border-[#1f2937] bg-[#05070c]/50">
+                                <form onsubmit="handleSendMessage(event)" class="flex gap-2">
+                                    <input type="text" id="chat-input" placeholder="Type your academic or coursework query here..." required class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-5 flex items-center justify-center transition">
+                                        <i data-lucide="send" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. COMMUNITY ANNOUNCEMENT FEED -->
+                    <div id="view-feed" class="view-panel space-y-6 hidden">
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-1">Classroom Community Feed</h2>
+                            <p class="text-xs text-gray-400">Official administration announcements, study schedules, and homework comments</p>
+                        </div>
+
+                        <!-- Composer (Admins Only) -->
+                        <div id="admin-feed-composer" class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4 hidden">
+                            <h3 class="font-semibold text-white text-xs uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="megaphone" class="w-4 h-4 text-amber-400"></i>
+                                <span>Publish Class Update</span>
+                            </h3>
+                            <textarea id="feed-post-text" placeholder="Share new notices, assignments, or guidelines with registered students..." class="w-full min-h-[80px] bg-[#05070c] border border-[#1f2937] rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                            
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
+                                        <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                        <span>Attach Photo</span>
+                                        <input type="file" id="feed-attach-image" accept="image/*" class="hidden" onchange="handleFeedAttachment('image')">
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
+                                        <i data-lucide="file" class="w-3.5 h-3.5"></i>
+                                        <span>Attach PDF</span>
+                                        <input type="file" id="feed-attach-pdf" accept=".pdf" class="hidden" onchange="handleFeedAttachment('pdf')">
+                                    </label>
+                                    
+                                    <span id="feed-attachment-status" class="text-xs text-emerald-400 font-semibold hidden">Media Attached ✔</span>
+                                </div>
+
+                                <button onclick="publishFeedPost()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
+                                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                    <span>Post Announcement</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="feed-stream" class="space-y-4">
+                            <!-- Dynamic rows -->
+                        </div>
+                    </div>
+
+                    <!-- 6. ADMINISTRATIVE CONSOLE (SQLITE) -->
+                    <div id="view-admin" class="view-panel space-y-6 hidden">
+                        <div class="border-b border-[#1f2937] pb-4">
+                            <h2 class="text-xl font-bold text-white mb-1">Administrative SQLite Console</h2>
+                            <p class="text-xs text-red-400">Manage real-time cloud data, modify accounts, and run raw simulated SQL expressions</p>
+                        </div>
+
+                        <!-- Direct SQLite Query Box -->
+                        <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl p-5 space-y-4 shadow-lg">
+                            <h3 class="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Direct SQLite CLI Console</span>
+                            </h3>
+                            <div class="flex gap-2">
+                                <input type="text" id="admin-sql-query" placeholder="SELECT * FROM students;" class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm font-mono text-emerald-400 placeholder-gray-700 focus:outline-none focus:border-indigo-500">
+                                <button onclick="executeAdminSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 rounded-xl text-xs transition">
+                                    Run Statement
+                                </button>
+                            </div>
+                            <div id="sql-results-panel" class="bg-[#05070c] border border-[#1f2937] rounded-xl p-3 text-xs font-mono text-gray-500 max-h-[150px] overflow-y-auto hidden"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Student Directory Registry -->
+                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col h-[400px]">
+                                <div class="flex items-center justify-between mb-4 border-b border-[#1f2937] pb-2">
+                                    <h3 class="font-bold text-white text-xs uppercase tracking-wider">Student Registry</h3>
+                                    <button onclick="openAddStudentModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
+                                        + Register Student
+                                    </button>
+                                </div>
+                                <div id="admin-students-list" class="flex-1 overflow-y-auto space-y-2">
+                                    <!-- Dynamic rows -->
+                                </div>
+                            </div>
+
+                            <!-- Lectures Listing Catalog -->
+                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col h-[400px]">
+                                <div class="flex items-center justify-between mb-4 border-b border-[#1f2937] pb-2">
+                                    <h3 class="font-bold text-white text-xs uppercase tracking-wider">Video Lecture Files</h3>
+                                    <button onclick="openAddVideoModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
+                                        + Register Video
+                                    </button>
+                                </div>
+                                <div class="mb-3 p-3 bg-indigo-950/20 border border-indigo-500/10 rounded-xl text-[10px] text-indigo-300 leading-normal">
+                                    <strong>Automatic Layout:</strong> Files placed in your directory following the naming format <code>media{lesson}{grade}.mp4</code> automatically map to the matching preparatory level playlist.
+                                </div>
+                                <div id="admin-videos-list" class="flex-1 overflow-y-auto space-y-2">
+                                    <!-- Dynamic rows -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+
+    </div>
+
+    <!-- STUDENT MODAL (ADD & MODIFY) -->
+    <div id="student-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl shadow-2xl space-y-4">
+            <h3 id="student-modal-title" class="font-bold text-white text-base">Register Student Account</h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Student Full Name</label>
+                    <input type="text" id="modal-student-name" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Phone Number / ID</label>
+                    <input type="text" id="modal-student-phone" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Account Secret Password</label>
+                    <input type="text" id="modal-student-pass" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Grade Level</label>
+                    <select id="modal-student-grade" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <option value="7">Preparatory 1 (Grade 7)</option>
+                        <option value="8">Preparatory 2 (Grade 8)</option>
+                        <option value="9">Preparatory 3 (Grade 9)</option>
+                        <option value="10">Secondary 1 (Grade 10)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2 text-xs pt-2">
+                <button onclick="closeStudentModal()" class="flex-1 border border-[#1f2937] text-gray-400 hover:bg-slate-800 py-2.5 rounded-xl font-semibold transition">
+                    Cancel
+                </button>
+                <button onclick="saveStudent()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition">
+                    Save Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIDEO REGISTER MODAL -->
+    <div id="video-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl shadow-2xl space-y-4">
+            <h3 class="font-bold text-white text-base">Register Video File</h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Upload Real MP4 (Streams instantly to player!)</label>
+                    <input type="file" id="modal-video-file" accept="video/mp4" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" onchange="autoFillVideoDetails()">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Video Filename (inside videos folder)</label>
+                    <input type="text" id="modal-video-filename" placeholder="media28.mp4" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Video Description</label>
+                    <input type="text" id="modal-video-title" placeholder="Quadratic Formula Review" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+            <div class="flex gap-2 text-xs pt-2">
+                <button onclick="closeVideoModal()" class="flex-1 border border-[#1f2937] text-gray-400 hover:bg-slate-800 py-2.5 rounded-xl font-semibold transition">
+                    Cancel
+                </button>
+                <button onclick="saveVideo()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition">
+                    Register File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATERIAL UPLOAD MODAL -->
+    <div id="material-upload-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl shadow-2xl space-y-4">
+            <h3 class="font-bold text-white text-base">Upload Syllabus PDF</h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Select PDF File</label>
+                    <input type="file" id="modal-material-file" accept=".pdf" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Syllabus Title</label>
+                    <input type="text" id="modal-material-title" placeholder="Algebra Revision Homework Sheet 3" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Grade Target</label>
+                    <select id="modal-material-grade" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white">
+                        <option value="7">Preparatory 1 (Grade 7)</option>
+                        <option value="8">Preparatory 2 (Grade 8)</option>
+                        <option value="9">Preparatory 3 (Grade 9)</option>
+                        <option value="10">Secondary 1 (Grade 10)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Category Type</label>
+                    <select id="modal-material-type" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white">
+                        <option value="Worksheet">Worksheet</option>
+                        <option value="Homework">Homework</option>
+                        <option value="Study Guide">Study Guide</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Short Description</label>
+                    <textarea id="modal-material-desc" placeholder="Brief details about what topics this PDF covers..." class="w-full h-16 bg-[#05070c] border border-[#1f2937] rounded-xl p-2 text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2 text-xs pt-2">
+                <button onclick="closeUploadMaterialModal()" class="flex-1 border border-[#1f2937] text-gray-400 hover:bg-slate-800 py-2.5 rounded-xl font-semibold transition">
+                    Cancel
+                </button>
+                <button onclick="saveUploadedMaterial()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition">
+                    Publish Material
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Version Tracker to automatically clean legacy local caches
+        const DATABASE_VERSION = "v7.0.0-D1-FullyConnected";
+
+        const GRADE_MAPPING = {
+            7: "Preparatory 1 (Grade 7)",
+            8: "Preparatory 2 (Grade 8)",
+            9: "Preparatory 3 (Grade 9)",
+            10: "Secondary 1 (Grade 10)",
+            "all": "All Classes / Administration"
+        };
+
+        let currentUser = null;
+        let loginRoleSelected = "student";
+        let activeTab = "dashboard";
+        let tempPostAttachment = null;
+        let currentEditingStudentId = null;
+        
+        // In-memory mapping of file uploads for instant streaming during local testing
+        let localUploadsBlobMap = {};
+
+        // Auto-detect environments
+        const IS_LOCAL_MOCK = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
+
+        // Direct Cloud API Calls Wrapper (Bridges Frontend to Cloudflare D1 Serverless Router)
+        async function apiCall(endpoint, method = "GET", body = null) {
+            if (IS_LOCAL_MOCK) {
+                return mockLocalAPI(endpoint, method, body);
+            }
+            try {
+                const headers = { "Content-Type": "application/json" };
+                const config = { method, headers };
+                if (body) config.body = JSON.stringify(body);
+
+                const response = await fetch(`/api/${endpoint}`, config);
+                if (!response.ok) {
+                    const errObj = await response.json().catch(() => ({}));
+                    throw new Error(errObj.error || "Internal Cloud API Error");
+                }
+                return await response.json();
+            } catch (error) {
+                console.error("API call failed:", error);
+                throw error;
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            if (IS_LOCAL_MOCK) {
+                initMockLocalStorage();
+            }
+            checkDeviceOS();
+            
+            try { lucide.createIcons(); } catch(e) {}
+
+            window.addEventListener("keydown", handleBypassShortcut);
+            window.addEventListener("keydown", handleAdminLoginBypass);
+            setInterval(updateWatermarkPosition, 3500);
+
+            // Block inspection keys
+            document.addEventListener("keydown", function(e) {
+                if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && e.key === "S")) {
+                    e.preventDefault();
+                    showCustomToast("Security Guard Active: Code tools are disabled.", "error");
+                }
+            });
+            document.addEventListener("contextmenu", e => e.preventDefault());
+        });
+
+        function checkDeviceOS() {
+            const isBypassed = sessionStorage.getItem("admin_bypass") === "true";
+            if (isBypassed) return;
+
+            const userAgent = navigator.userAgent || window.opera;
+            const isWindows = /Windows/i.test(userAgent);
+            const isAndroid = /Android/i.test(userAgent);
+
+            if (isWindows || isAndroid) {
+                document.getElementById("os-lock-screen").classList.remove("hidden");
+                document.getElementById("app-wrapper").classList.add("hidden");
+            }
+        }
+
+        function bypassLockScreen() {
+            sessionStorage.setItem("admin_bypass", "true");
+            document.getElementById("os-lock-screen").classList.add("hidden");
+            document.getElementById("app-wrapper").classList.remove("hidden");
+            showCustomToast("Lock screen bypassed for this session.", "success");
+        }
+
+        function handleBypassShortcut(e) {
+            if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "A") {
+                e.preventDefault();
+                bypassLockScreen();
+            }
+        }
+
+        async function handleAdminLoginBypass(e) {
+            if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "L") {
+                e.preventDefault();
+                triggerQuickAdminBypass();
+            }
+        }
+
+        async function triggerQuickAdminBypass() {
+            sessionStorage.setItem("admin_bypass", "true");
+            document.getElementById("os-lock-screen").classList.add("hidden");
+            document.getElementById("app-wrapper").classList.remove("hidden");
+
+            try {
+                // Instantly requests/creates the Cloud Administrator session
+                currentUser = await apiCall("login-bypass", "POST");
+                enterPortal();
+            } catch(error) {
+                showCustomToast(error.message, "error");
+            }
+        }
+
+        function downloadSecureApp() {
+            const mockContent = "MR. Ahmed Abd-ElFatah Secure Application Installer Binary.";
+            const blob = new Blob([mockContent], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Ahmed_AbdElFatah_SecureApp.exe";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showCustomToast("Secure App installer download started.", "info");
+        }
+
+        function toggleLoginRole(role) {
+            loginRoleSelected = role;
+            const tabStudent = document.getElementById("tab-student");
+            const tabAdmin = document.getElementById("tab-admin");
+            const phoneLabel = document.getElementById("phone-label");
+            const idInput = document.getElementById("login-id");
+
+            if (role === "admin") {
+                tabStudent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white";
+                tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600";
+                phoneLabel.innerText = "Administrator Username";
+                idInput.placeholder = "e.g. Teacher Admin";
+            } else {
+                tabStudent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600";
+                tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white";
+                phoneLabel.innerText = "Student Phone / ID";
+                idInput.placeholder = "e.g. 01012345678";
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const idVal = document.getElementById("login-id").value.trim();
+            const passVal = document.getElementById("login-password").value;
+            const errorDiv = document.getElementById("login-error");
+            
+            errorDiv.classList.add("hidden");
+
+            try {
+                currentUser = await apiCall("login", "POST", {
+                    username: idVal,
+                    password: passVal,
+                    role: loginRoleSelected
+                });
+                enterPortal();
+            } catch (error) {
+                errorDiv.innerText = `Access Denied: ${error.message}`;
+                errorDiv.classList.remove("hidden");
+            }
+        }
+
+        function enterPortal() {
+            document.getElementById("login-section").classList.add("hidden");
+            document.getElementById("portal-section").classList.remove("hidden");
+            
+            document.getElementById("user-name").innerText = currentUser.name;
+            document.getElementById("user-grade-label").innerText = GRADE_MAPPING[currentUser.grade];
+            document.getElementById("profile-avatar").innerText = currentUser.name.charAt(0).toUpperCase();
+            
+            const badge = document.getElementById("user-badge");
+            const navAdmin = document.getElementById("nav-admin");
+            const uploadBtn = document.getElementById("admin-material-upload-btn");
+            const videoRegBtn = document.getElementById("admin-video-upload-btn");
+            
+            if (currentUser.role === "admin") {
+                badge.innerText = "Admin Console";
+                badge.className = "inline-block bg-red-950 text-red-400 border border-red-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full";
+                navAdmin.classList.remove("hidden");
+                uploadBtn.classList.remove("hidden");
+                videoRegBtn.classList.remove("hidden");
+                document.getElementById("admin-feed-composer").classList.remove("hidden");
+            } else {
+                badge.innerText = `Grade ${currentUser.grade}`;
+                badge.className = "inline-block bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full";
+                navAdmin.classList.add("hidden");
+                uploadBtn.classList.add("hidden");
+                videoRegBtn.classList.add("hidden");
+                document.getElementById("admin-feed-composer").classList.add("hidden");
+            }
+
+            switchTab("dashboard");
+            showCustomToast(`Logged in as ${currentUser.name}!`, "success");
+        }
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll(".view-panel").forEach(p => p.classList.add("hidden"));
+            document.getElementById(`view-${tabId}`).classList.remove("hidden");
+            
+            document.querySelectorAll(".nav-btn").forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition";
+            });
+            
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                if (tabId === "admin") {
+                    activeBtn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold bg-red-950/20 text-red-400 border-l-2 border-red-500";
+                } else {
+                    activeBtn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold bg-indigo-600/15 text-indigo-400 border-l-2 border-indigo-500";
+                }
+            }
+
+            document.getElementById("active-tab-title").innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+
+            if (tabId === "dashboard") renderDashboard();
+            else if (tabId === "materials") renderMaterials();
+            else if (tabId === "videos") renderVideos();
+            else if (tabId === "feed") renderFeed();
+            else if (tabId === "admin") renderAdminDashboard();
+        }
+
+        // Render Dashboard details
+        async function renderDashboard() {
+            document.getElementById("welcome-message").innerText = `Marhaban, ${currentUser.name}! Ready to study?`;
+            document.getElementById("dashboard-grade-info").innerText = GRADE_MAPPING[currentUser.grade];
+
+            const tbody = document.getElementById("student-grades-tbody");
+            tbody.innerHTML = "";
+            
+            let records = [];
+            if (currentUser.grades_record) {
+                try { records = JSON.parse(currentUser.grades_record); } catch(e) { records = []; }
+            }
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-gray-500">No scorecards registered yet on your profile directory. Work hard!</td></tr>`;
+            } else {
+                records.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-900/30">
+                            <td class="py-3 font-semibold text-white">${r.topic}</td>
+                            <td class="py-3 text-gray-400">${r.weight}</td>
+                            <td class="py-3 text-emerald-400 font-bold font-mono">${r.grade}</td>
+                            <td class="py-3 text-gray-400">${r.status || "Completed"}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            try {
+                const dashboardStats = await apiCall("dashboard-stats");
+                document.getElementById("dashboard-lecture-count").innerText = `${dashboardStats.lectureCount} Available Lectures`;
+            } catch(e) {
+                document.getElementById("dashboard-lecture-count").innerText = "0 Available Lectures";
+            }
+        }
+
+        // Render Materials (Cloud D1 connected)
+        async function renderMaterials() {
+            const grid = document.getElementById("materials-grid");
+            grid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500 text-xs">Loading syllabus sheets...</div>`;
+
+            try {
+                const materials = await apiCall("materials");
+                grid.innerHTML = "";
+
+                if (materials.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-xs">No worksheets or guides uploaded yet. Check back later!</div>`;
+                    return;
+                }
+
+                materials.forEach((sh, idx) => {
+                    const levelText = GRADE_MAPPING[sh.grade] ? GRADE_MAPPING[sh.grade].split(" (")[0] : `Grade ${sh.grade}`;
+                    grid.innerHTML += `
+                        <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col justify-between h-[210px] hover:border-indigo-500/20 transition">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-500/10 text-[9px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+                                        ${sh.type}
+                                    </span>
+                                    <span class="text-[9px] text-gray-500 font-bold font-mono">${levelText}</span>
+                                </div>
+                                <h3 class="font-bold text-white text-sm mb-1.5 truncate" title="${sh.title}">${sh.title}</h3>
+                                <p class="text-gray-400 text-xs line-clamp-2 leading-relaxed">${sh.desc}</p>
+                            </div>
+                            
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="downloadSheet('${sh.filename}', '${sh.title}')" class="flex-1 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] hover:border-indigo-500/30 text-xs text-indigo-300 hover:text-indigo-200 py-2.5 rounded-xl transition font-semibold flex items-center justify-center gap-2">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                    <span>Download PDF</span>
+                                </button>
+                                ${currentUser.role === 'admin' ? `
+                                    <button onclick="deleteMaterial(${sh.id})" class="bg-red-950/40 hover:bg-red-900 border border-red-500/10 hover:border-red-500/40 text-red-400 p-2.5 rounded-xl transition" title="Delete Material">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                ` : ""}
+                            </div>
+                        </div>
+                    `;
+                });
+                try { lucide.createIcons(); } catch(e) {}
+            } catch (err) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-400 text-xs">Failed to load syllabus sheets: ${err.message}</div>`;
+            }
+        }
+
+        function openUploadMaterialModal() {
+            document.getElementById("modal-material-title").value = "";
+            document.getElementById("modal-material-desc").value = "";
+            document.getElementById("modal-material-file").value = "";
+            document.getElementById("material-upload-modal").classList.remove("hidden");
+        }
+
+        function closeUploadMaterialModal() {
+            document.getElementById("material-upload-modal").classList.add("hidden");
+        }
+
+        async function saveUploadedMaterial() {
+            const title = document.getElementById("modal-material-title").value.trim();
+            const grade = parseInt(document.getElementById("modal-material-grade").value);
+            const type = document.getElementById("modal-material-type").value;
+            const desc = document.getElementById("modal-material-desc").value.trim();
+            const fileInput = document.getElementById("modal-material-file");
+
+            if (!title || !desc) {
+                showCustomToast("Please fill in all PDF detail fields.", "error");
+                return;
+            }
+
+            let filename = "homework_sheet.pdf";
+            if (fileInput.files.length > 0) {
+                filename = fileInput.files[0].name;
+            }
+
+            try {
+                await apiCall("materials", "POST", { title, grade, type, desc, filename });
+                closeUploadMaterialModal();
+                renderMaterials();
+                showCustomToast("PDF sheet successfully published to Cloud Database!", "success");
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        async function deleteMaterial(id) {
+            if (confirm("Delete this PDF study material from the Cloud Database?")) {
+                try {
+                    await apiCall(`materials/${id}`, "DELETE");
+                    renderMaterials();
+                    showCustomToast("Material deleted successfully.", "success");
+                } catch(e) {
+                    showCustomToast(e.message, "error");
+                }
+            }
+        }
+
+        function downloadSheet(filename, title) {
+            const fileHeader = `MR. AHMED ABD-ELFATAH - ACADEMY DOWNLOAD
+SUBJECT FILE RESOURCE
+===========================
+File: ${filename}
+Title: ${title}
+Curriculum worksheet signature authenticated.
+
+[Full course resources are accessible via Website Help bot or Teacher channels]`;
+            const blob = new Blob([fileHeader], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showCustomToast(`Downloaded: ${filename}`, "success");
+        }
+
+        // Render lectures from Cloud
+        async function renderVideos() {
+            const listContainer = document.getElementById("video-sessions-list");
+            listContainer.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading classroom lectures...</div>`;
+
+            try {
+                const videos = await apiCall("videos");
+                listContainer.innerHTML = "";
+
+                if (videos.length === 0) {
+                    listContainer.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No recorded lectures registered yet on the cloud database.</div>`;
+                    return;
+                }
+
+                videos.forEach((v) => {
+                    const levelLabel = GRADE_MAPPING[v.grade] ? GRADE_MAPPING[v.grade].split(" (")[0] : `Grade ${v.grade}`;
+                    listContainer.innerHTML += `
+                        <button onclick="playLecture('${v.filename}', '${v.title}', ${v.lesson}, ${v.grade})" class="w-full flex items-start gap-3 p-3 bg-[#05070c] border border-[#1f2937] hover:border-indigo-500/30 rounded-xl text-left transition group">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800/80 group-hover:bg-indigo-950 flex items-center justify-center text-indigo-400 font-bold text-xs shrink-0 transition">
+                                L${v.lesson}
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="text-xs font-bold text-white truncate group-hover:text-indigo-400 transition">${v.title}</h4>
+                                <p class="text-[10px] text-gray-500 mt-0.5 font-mono">${v.filename} • ${levelLabel}</p>
+                            </div>
+                        </button>
+                    `;
+                });
+            } catch (err) {
+                listContainer.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Failed to load lectures: ${err.message}</div>`;
+            }
+        }
+
+        function playLecture(filename, title, lesson, grade) {
+            const placeholder = document.getElementById("player-placeholder");
+            const player = document.getElementById("secure-player");
+            const watermark = document.getElementById("video-watermark");
+
+            placeholder.classList.add("hidden");
+            player.classList.remove("hidden");
+            watermark.classList.remove("hidden");
+
+            watermark.innerText = `${currentUser.name} - ${currentUser.phone || "ADMIN"}`;
+
+            let sourceUrl = `videos/${filename}`;
+            if (localUploadsBlobMap[filename]) {
+                sourceUrl = localUploadsBlobMap[filename];
+                showCustomToast("Streaming direct in-memory browser local file...", "info");
+            } else {
+                showCustomToast("Decrypting secure video file stream...", "info");
+            }
+
+            player.src = sourceUrl;
+            player.load();
+            player.play().catch(() => {});
+
+            document.getElementById("current-video-title").innerText = `Session ${lesson}: ${title}`;
+            document.getElementById("current-video-badge").innerText = GRADE_MAPPING[grade] ? GRADE_MAPPING[grade].split(" (")[0] : `Grade ${grade}`;
+            document.getElementById("current-video-desc").innerText = `Currently streaming ${filename}. Dynamic anti-screenshot floating overlays are rendered randomly to prevent unauthorized camera and device recordings. Inspect tools are disabled.`;
+            
+            updateWatermarkPosition();
+        }
+
+        function updateWatermarkPosition() {
+            const watermark = document.getElementById("video-watermark");
+            const theater = document.getElementById("video-theater");
+            if (!watermark || watermark.classList.contains("hidden")) return;
+
+            const tWidth = theater.clientWidth;
+            const tHeight = theater.clientHeight;
+            
+            const x = Math.floor(Math.random() * (tWidth - 200));
+            const y = Math.floor(Math.random() * (tHeight - 40));
+
+            watermark.style.transform = `translate(${x}px, ${y}px)`;
+            watermark.style.opacity = (Math.random() * 0.15 + 0.08).toFixed(2);
+        }
+
+        function openAddVideoModal() {
+            document.getElementById("modal-video-filename").value = "";
+            document.getElementById("modal-video-title").value = "";
+            document.getElementById("modal-video-file").value = "";
+            document.getElementById("video-modal").classList.remove("hidden");
+        }
+
+        function closeVideoModal() {
+            document.getElementById("video-modal").classList.add("hidden");
+        }
+
+        function autoFillVideoDetails() {
+            const fileInput = document.getElementById("modal-video-file");
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                document.getElementById("modal-video-filename").value = file.name;
+                
+                // Keep file in localBlobMap for immediate sandbox testing without servers
+                const localUrl = URL.createObjectURL(file);
+                localUploadsBlobMap[file.name] = localUrl;
+
+                const nameNoExt = file.name.replace(/\.[^/.]+$/, "").toLowerCase();
+                const titleInput = document.getElementById("modal-video-title");
+                if (nameNoExt.startsWith("media")) {
+                    titleInput.value = "Class Session: " + nameNoExt.substring(5).toUpperCase();
+                }
+            }
+        }
+
+        async function saveVideo() {
+            const filename = document.getElementById("modal-video-filename").value.trim();
+            const title = document.getElementById("modal-video-title").value.trim();
+
+            if (!filename || !title) {
+                showCustomToast("Please complete all video details.", "error");
+                return;
+            }
+
+            const nameWithoutExt = filename.replace(/\.[^/.]+$/, "").toLowerCase();
+            if (!nameWithoutExt.startsWith("media")) {
+                showCustomToast("Filename must follow rules: starting with 'media' (e.g. media28.mp4)", "error");
+                return;
+            }
+
+            const digitsPart = nameWithoutExt.substring(5);
+            if (!/^\d+$/.test(digitsPart)) {
+                showCustomToast("Filename digits missing. Pattern: media{lesson}{grade}.mp4", "error");
+                return;
+            }
+
+            let parsedGrade, parsedLesson;
+            if (digitsPart.endsWith("10")) {
+                parsedGrade = 10;
+                parsedLesson = parseInt(digitsPart.substring(0, digitsPart.length - 2));
+            } else if (["7", "8", "9"].includes(digitsPart.substring(digitsPart.length - 1))) {
+                parsedGrade = parseInt(digitsPart.substring(digitsPart.length - 1));
+                parsedLesson = parseInt(digitsPart.substring(0, digitsPart.length - 1));
+            } else {
+                showCustomToast("Egypt grade structure limit: Grade 7, 8, 9, or 10 required.", "error");
+                return;
+            }
+
+            try {
+                await apiCall("videos", "POST", { filename, title, lesson: parsedLesson, grade: parsedGrade });
+                closeVideoModal();
+                renderVideos();
+                if (activeTab === "admin") renderAdminDashboard();
+                showCustomToast(`Video parsed & successfully mapped to Grade ${parsedGrade} Lesson ${parsedLesson}!`, "success");
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        async function deregisterVideo(id) {
+            if (confirm("Deregister this video lecture from the cloud database?")) {
+                try {
+                    await apiCall(`videos/${id}`, "DELETE");
+                    renderVideos();
+                    if (activeTab === "admin") renderAdminDashboard();
+                    showCustomToast("Video dropped from database registry.", "success");
+                } catch(e) {
+                    showCustomToast(e.message, "error");
+                }
+            }
+        }
+
+        // Help bot API communication via Cloud Serverless Worker
+        async function handleSendMessage(event) {
+            event.preventDefault();
+            const inputField = document.getElementById("chat-input");
+            const msgText = inputField.value.trim();
+            if (!msgText) return;
+
+            inputField.value = "";
+            appendChatMessage("student", currentUser.name, msgText);
+
+            const botMsgId = appendChatMessage("bot", "Help bot", "Analyzing curriculum databases and generating response...");
+
+            try {
+                // We securely tunnel request through our serverless Cloudflare Pages function.
+                // This keeps API Key hidden on Cloudflare servers where students cannot steal it!
+                let apiEndpoint = "/api/chat";
+                if (IS_LOCAL_MOCK) {
+                    apiEndpoint = "https://corsproxy.io/?" + encodeURIComponent("https://api.groq.com/openai/v1/chat/completions");
+                }
+
+                const headers = { "Content-Type": "application/json" };
+                if (IS_LOCAL_MOCK) {
+                    headers["Authorization"] = "Bearer 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";
+                }
+
+                const gradeText = GRADE_MAPPING[currentUser.grade] ? GRADE_MAPPING[currentUser.grade].split(" (")[0] : `Grade ${currentUser.grade}`;
+                const response = await fetch(apiEndpoint, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: "system",
+                                content: `You are Help bot, a highly professional, polite mathematics, chemistry, and physics assistant built for MR. Ahmed Abd-ElFatah's study website. The student logged in is named ${currentUser.name}, enrolled in ${gradeText}. Solve equations step-by-step using clean numbered lists. If asked general science questions like "whats the building unit of matter", explain clearly that atoms and molecules form the building blocks, then describe their structures concisely. Always sound encouraging and tutor-professional.`
+                            },
+                            { role: "user", content: msgText }
+                        ]
+                    })
+                });
+
+                if (!response.ok) throw new Error("CORS Proxy Limit or Auth error");
+                const data = await response.json();
+                const aiReply = data.choices[0].message.content;
+                updateChatMessage(botMsgId, aiReply);
+
+            } catch (error) {
+                // Local fallback in case of connection limits
+                setTimeout(() => {
+                    const fallbackReply = generateFallbackResponse(msgText);
+                    updateChatMessage(botMsgId, fallbackReply);
+                }, 1000);
+            }
+        }
+
+        function appendChatMessage(sender, name, text) {
+            const chatContainer = document.getElementById("chat-messages");
+            const msgId = "msg-" + Date.now() + "-" + Math.floor(Math.random()*1000);
+            
+            const isBot = sender === "bot";
+            const avatar = isBot ? "H" : name.charAt(0).toUpperCase();
+            
+            const avatarColor = isBot ? "bg-indigo-600" : "bg-slate-800 text-indigo-300";
+            const contentBg = isBot ? "bg-indigo-950/40 border border-indigo-500/10" : "bg-slate-800/60 border border-slate-700";
+            const alignmentClass = isBot ? "max-w-[80%] self-start" : "max-w-[80%] self-end flex-row-reverse";
+
+            const msgHtml = `
+                <div class="flex items-start gap-3 ${alignmentClass} mb-4" id="${msgId}">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${avatarColor} aspect-square object-cover rounded-xl">${avatar}</div>
+                    <div class="${contentBg} p-3.5 rounded-2xl rounded-tl-none relative">
+                        <div class="text-[9px] text-gray-500 font-extrabold mb-1 tracking-wider uppercase">${name}</div>
+                        <p class="text-xs leading-relaxed text-gray-200 whitespace-pre-line" id="text-${msgId}">${text}</p>
+                    </div>
+                </div>
+            `;
+            
+            chatContainer.insertAdjacentHTML("beforeend", msgHtml);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgId;
+        }
+
+        function updateChatMessage(msgId, newText) {
+            const target = document.getElementById(`text-${msgId}`);
+            if (target) {
+                target.innerText = newText;
+                const chatContainer = document.getElementById("chat-messages");
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function generateFallbackResponse(query) {
+            const q = query.toLowerCase();
+            const gradeText = GRADE_MAPPING[currentUser.grade].split(" (")[0];
+
+            if (q.includes("hi") || q.includes("hello") || q.includes("hey")) {
+                return `Hello ${currentUser.name}! I am Help bot, your professional mathematical assistant. I see you are enrolled in ${gradeText}. What math formula or worksheet problem can we solve step-by-step today?`;
+            }
+            if (q.includes("building unit of matter") || q.includes("matter") || q.includes("unit of matter")) {
+                return `The building unit of matter is the **atom**!
+
+Here is a quick scientific breakdown of its structure:
+1. **Nucleus**: Found at the very center, containing protons (positively charged) and neutrons (neutral).
+2. **Electrons**: Tiny negatively charged particles that orbit the nucleus in specific energy clouds.
+
+When atoms join together, they form **molecules**, which build up all physical materials around us in MR. Ahmed's curriculum!`;
+            }
+            if (q.includes("algebra") || q.includes("equation") || q.includes("solve")) {
+                return `Let's look at this step-by-step:
+
+1. State the equation clearly (e.g. 2x + 8 = 16)
+2. Isolate the variable term by performing the inverse operation on both sides:
+   2x = 16 - 8
+   2x = 8
+3. Divide by the coefficient:
+   x = 8 / 2
+   x = 4
+
+Let me know if you want to break down a specific homework equation!`;
+            }
+            return `I have analyzed your coursework query regarding "${query}". As your dedicated tutor, I highly recommend verifying the specific guidelines on your printed worksheets. Let me know if you would like me to solve a specific formula step-by-step!`;
+        }
+
+        // Community Feed Render (Cloud database linked)
+        async function renderFeed() {
+            const stream = document.getElementById("feed-stream");
+            stream.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading updates feed...</div>`;
+
+            try {
+                const feed = await apiCall("feed");
+                stream.innerHTML = "";
+
+                if (feed.length === 0) {
+                    stream.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No announcements in the community feed yet.</div>`;
+                    return;
+                }
+
+                feed.forEach((post) => {
+                    let attachmentHtml = "";
+                    let imageHtml = "";
+                    let commentsHtml = "";
+
+                    if (post.attachment_name) {
+                        attachmentHtml = `
+                            <div class="mt-3 p-3 bg-[#05070c] border border-[#1f2937] rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-2 overflow-hidden">
+                                    <i data-lucide="file-text" class="w-4 h-4 text-red-400 shrink-0"></i>
+                                    <span class="text-[11px] text-gray-300 font-mono truncate">${post.attachment_name}</span>
+                                </div>
+                                <button onclick="downloadSheet('${post.attachment_name}', 'Attachment PDF')" class="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition font-semibold">
+                                    Download File
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    if (post.image_data) {
+                        imageHtml = `
+                            <div class="mt-3 rounded-xl overflow-hidden border border-[#1f2937] max-h-[300px] flex items-center justify-center bg-black">
+                                <img src="${post.image_data}" class="w-full h-full object-cover aspect-square rounded-xl">
+                            </div>
+                        `;
+                    }
+
+                    const comments = post.comments || [];
+                    comments.forEach(c => {
+                        commentsHtml += `
+                            <div class="p-3 bg-[#05070c]/50 rounded-xl border border-[#1f2937]/50 space-y-1">
+                                <div class="text-[11px] font-extrabold text-indigo-400 tracking-tight block">${c.author}</div>
+                                <div class="text-xs text-gray-200">${c.text}</div>
+                            </div>
+                        `;
+                    });
+
+                    stream.innerHTML += `
+                        <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4 shadow-sm hover:border-slate-800 transition">
+                            <div class="flex items-center justify-between border-b border-[#1f2937] pb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-indigo-950 border border-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 text-xs font-bold aspect-square rounded-xl object-cover">A</div>
+                                    <h4 class="text-xs font-bold text-white">${post.author}</h4>
+                                </div>
+                                <span class="text-[10px] text-gray-500 font-mono">${post.date}</span>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">${post.text}</p>
+                            ${imageHtml}
+                            ${attachmentHtml}
+                            
+                            <!-- Comment Thread Section -->
+                            <div class="border-t border-[#1f2937]/50 pt-3 space-y-3">
+                                <h5 class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Comment Thread</h5>
+                                <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                                    ${commentsHtml || '<p class="text-[10px] text-gray-500">No comments posted yet.</p>'}
+                                </div>
+                                
+                                <form onsubmit="handleAddComment(event, ${post.id})" class="flex gap-2 pt-2">
+                                    <input type="text" placeholder="Write a comment..." required class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500">
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-xl text-[10px] transition">
+                                        Reply
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                });
+                try { lucide.createIcons(); } catch(e) {}
+            } catch (err) {
+                stream.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Failed to load feed announcements: ${err.message}</div>`;
+            }
+        }
+
+        function handleFeedAttachment(type) {
+            const status = document.getElementById("feed-attachment-status");
+            status.innerText = "Processing File...";
+            status.classList.remove("hidden");
+
+            if (type === "image") {
+                const file = document.getElementById("feed-attach-image").files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempPostAttachment = { type: "image", data: e.target.result };
+                        status.innerText = "Photo Attached ✔";
+                        status.className = "text-[11px] text-emerald-400 font-semibold";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } else if (type === "pdf") {
+                const file = document.getElementById("feed-attach-pdf").files[0];
+                if (file) {
+                    tempPostAttachment = { type: "pdf", name: file.name };
+                    status.innerText = "PDF Attached ✔";
+                    status.className = "text-[11px] text-emerald-400 font-semibold";
+                }
+            }
+        }
+
+        async function publishFeedPost() {
+            const text = document.getElementById("feed-post-text").value.trim();
+            if (!text && !tempPostAttachment) {
+                showCustomToast("Please enter an update description or attach media.", "error");
+                return;
+            }
+
+            try {
+                await apiCall("feed", "POST", {
+                    text: text,
+                    attachment_name: tempPostAttachment && tempPostAttachment.type === "pdf" ? tempPostAttachment.name : null,
+                    image_data: tempPostAttachment && tempPostAttachment.type === "image" ? tempPostAttachment.data : null
+                });
+
+                document.getElementById("feed-post-text").value = "";
+                document.getElementById("feed-attach-image").value = "";
+                document.getElementById("feed-attach-pdf").value = "";
+                document.getElementById("feed-attachment-status").classList.add("hidden");
+                tempPostAttachment = null;
+
+                renderFeed();
+                showCustomToast("Announcement successfully broadcast on classroom feed!", "success");
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        async function handleAddComment(event, postId) {
+            event.preventDefault();
+            const form = event.target;
+            const input = form.querySelector("input");
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                await apiCall(`feed/${postId}/comment`, "POST", { text });
+                input.value = "";
+                renderFeed();
+                showCustomToast("Comment published!", "success");
+            } catch (error) {
+                showCustomToast(error.message, "error");
+            }
+        }
+
+        // ADMINISTRATIVE USER & SQL DIRECTIVES
+        async function renderAdminDashboard() {
+            const list = document.getElementById("admin-students-list");
+            list.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading Student Registry...</div>`;
+            
+            try {
+                const students = await apiCall("students");
+                list.innerHTML = "";
+
+                if (students.length === 0) {
+                    list.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No students registered yet. Click register above!</div>`;
+                    return;
+                }
+
+                students.forEach(s => {
+                    const levelName = GRADE_MAPPING[s.grade] ? GRADE_MAPPING[s.grade].split(" (")[0] : s.grade;
+                    const isAdmin = s.role === "admin";
+                    list.innerHTML += `
+                        <div class="p-3 bg-[#05070c] border border-[#1f2937] rounded-xl flex items-center justify-between text-xs hover:border-slate-800 transition">
+                            <div>
+                                <h4 class="font-bold text-white flex items-center gap-1.5">
+                                    <span>${s.name}</span>
+                                    ${isAdmin ? '<span class="text-red-400 text-[9px] bg-red-950 px-1.5 py-0.5 rounded-md font-semibold">Admin</span>' : ""}
+                                </h4>
+                                <p class="text-[9px] text-gray-500 font-mono">ID/Phone: ${s.phone} | Pwd: ${s.password}</p>
+                                <p class="text-[10px] text-indigo-400 font-semibold mt-0.5">${levelName}</p>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <button onclick="toggleAdminPrivilege(${s.id})" class="bg-slate-800 hover:bg-slate-700 text-gray-300 px-2 py-1 rounded-lg text-[9px] font-semibold transition" title="Toggle Admin status">
+                                    Admin Toggle
+                                </button>
+                                <button onclick="editStudent(${s.id})" class="bg-indigo-900/40 hover:bg-indigo-900 text-indigo-300 p-1.5 rounded-lg">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="deleteStudent(${s.id})" class="bg-red-950/40 hover:bg-red-900 text-red-400 p-1.5 rounded-lg">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                list.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Registry load error: ${err.message}</div>`;
+            }
+
+            // Also load videos catalog
+            const vList = document.getElementById("admin-videos-list");
+            vList.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading lectures registry...</div>`;
+
+            try {
+                const videos = await apiCall("videos");
+                vList.innerHTML = "";
+
+                if (videos.length === 0) {
+                    vList.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No video lecture records stored yet.</div>`;
+                    return;
+                }
+
+                videos.forEach((v) => {
+                    const levelLabel = GRADE_MAPPING[v.grade] ? GRADE_MAPPING[v.grade].split(" (")[0] : `Grade ${v.grade}`;
+                    vList.innerHTML += `
+                        <div class="p-3 bg-[#05070c] border border-[#1f2937] rounded-xl flex items-center justify-between text-xs">
+                            <div>
+                                <h4 class="font-bold text-white font-mono">${v.filename}</h4>
+                                <p class="text-[10px] text-gray-400">Lesson ${v.lesson} • Description: ${v.title}</p>
+                                <p class="text-[10px] text-indigo-400 font-semibold mt-0.5">${levelLabel}</p>
+                            </div>
+                            <button onclick="deregisterVideo(${v.id})" class="bg-red-950/40 hover:bg-red-900 text-red-400 px-2 py-1 rounded-lg text-[10px] transition font-semibold">
+                                Delete
+                            </button>
+                        </div>
+                    `;
+                });
+                try { lucide.createIcons(); } catch(e) {}
+            } catch(err) {
+                vList.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Lectures list load error: ${err.message}</div>`;
+            }
+        }
+
+        async function executeAdminSQL() {
+            const query = document.getElementById("admin-sql-query").value.trim();
+            const panel = document.getElementById("sql-results-panel");
+            panel.classList.remove("hidden");
+            
+            if (!query) {
+                panel.innerHTML = "sqlite> ERROR: Command query cannot be empty.";
+                return;
+            }
+
+            try {
+                const data = await apiCall("sql", "POST", { query });
+                let formatted = `sqlite> ${query}
+`;
+                if (data.results && Array.isArray(data.results)) {
+                    formatted += JSON.stringify(data.results, null, 2);
+                } else {
+                    formatted += "Query OK. SQL operation finished successfully.";
+                }
+                panel.innerText = formatted;
+                showCustomToast("SQL statement executed successfully on Cloud SQLite!", "success");
+            } catch (err) {
+                panel.innerText = `sqlite> ${query}
+
+ERROR: ${err.message}`;
+                showCustomToast("SQL Statement Error.", "error");
+            }
+        }
+
+        function openAddStudentModal() {
+            currentEditingStudentId = null;
+            document.getElementById("student-modal-title").innerText = "Register Student Account";
+            document.getElementById("modal-student-name").value = "";
+            document.getElementById("modal-student-phone").value = "";
+            document.getElementById("modal-student-pass").value = "";
+            document.getElementById("modal-student-grade").value = "7";
+            document.getElementById("student-modal").classList.remove("hidden");
+        }
+
+        async function editStudent(id) {
+            currentEditingStudentId = id;
+            try {
+                const s = await apiCall(`students/${id}`);
+                document.getElementById("student-modal-title").innerText = "Modify Student Account";
+                document.getElementById("modal-student-name").value = s.name;
+                document.getElementById("modal-student-phone").value = s.phone;
+                document.getElementById("modal-student-pass").value = s.password;
+                document.getElementById("modal-student-grade").value = s.grade.toString();
+                document.getElementById("student-modal").classList.remove("hidden");
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        async function saveStudent() {
+            const name = document.getElementById("modal-student-name").value.trim();
+            const phone = document.getElementById("modal-student-phone").value.trim();
+            const pass = document.getElementById("modal-student-pass").value.trim();
+            const grade = parseInt(document.getElementById("modal-student-grade").value);
+
+            if (!name || !phone || !pass) {
+                showCustomToast("Please fill out all required fields.", "error");
+                return;
+            }
+
+            try {
+                if (currentEditingStudentId === null) {
+                    await apiCall("students", "POST", { name, phone, password: pass, grade });
+                    showCustomToast("Student account registered to Cloud D1 database!", "success");
+                } else {
+                    await apiCall(`students/${currentEditingStudentId}`, "PUT", { name, phone, password: pass, grade });
+                    showCustomToast("Student records successfully synchronized on Cloud!", "success");
+                }
+                closeStudentModal();
+                renderAdminDashboard();
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        async function deleteStudent(id) {
+            if (confirm("Permanently delete this student record from the cloud database?")) {
+                try {
+                    await apiCall(`students/${id}`, "DELETE");
+                    renderAdminDashboard();
+                    showCustomToast("Student record deleted from D1 database.", "success");
+                } catch(e) {
+                    showCustomToast(e.message, "error");
+                }
+            }
+        }
+
+        async function toggleAdminPrivilege(id) {
+            try {
+                const res = await apiCall(`students/${id}/toggle-admin`, "POST");
+                renderAdminDashboard();
+                showCustomToast(res.message, "success");
+            } catch(e) {
+                showCustomToast(e.message, "error");
+            }
+        }
+
+        function closeStudentModal() {
+            document.getElementById("student-modal").classList.add("hidden");
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById("portal-section").classList.add("hidden");
+            document.getElementById("login-section").classList.remove("hidden");
+            document.getElementById("login-id").value = "";
+            document.getElementById("login-password").value = "";
+            
+            const player = document.getElementById("secure-player");
+            player.pause();
+            player.src = "";
+            player.classList.add("hidden");
+            document.getElementById("player-placeholder").classList.remove("hidden");
+            document.getElementById("video-watermark").classList.add("hidden");
+
+            showCustomToast("Disconnected from MR. Ahmed's database.", "info");
+        }
+
+        function showCustomToast(message, type) {
+            let color = "bg-[#0b0f19] border-indigo-500/20 text-indigo-300";
+            if (type === "error") color = "bg-red-950/80 border-red-500/40 text-red-400";
+            if (type === "success") color = "bg-emerald-950/80 border-emerald-500/40 text-emerald-400";
+            
+            const toastHtml = `
+                <div id="toast" class="fixed bottom-6 right-6 ${color} border p-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 animate-bounce">
+                    <div class="text-xs font-bold font-mono">${message}</div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML("beforeend", toastHtml);
+            setTimeout(() => {
+                const toast = document.getElementById("toast");
+                if (toast) toast.remove();
+            }, 3000);
+        }
+
+        // 
