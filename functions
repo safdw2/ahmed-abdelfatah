@@ -1,0 +1,239 @@
+// Cloudflare Serverless Unified Router & D1 SQL execution controller for MR. Ahmed's website.
+// Place this inside: /functions/[[path]].js on your Cloudflare Pages folder layout.
+
+export async function onRequest(context) {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+
+    const corsHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Content-Type": "application/json"
+    };
+
+    if (method === "OPTIONS") {
+        return new Response(null, { headers: corsHeaders });
+    }
+
+    try {
+        const db = env.DB; // Refers to the bound Cloudflare D1 database (D1 instance must be bound to "DB")
+        if (!db) {
+            return new Response(JSON.stringify({ error: "Missing Bound D1 database context naming parameter 'DB'!" }), { status: 500, headers: corsHeaders });
+        }
+
+        // Initialize SQL tables inside D1 if they don't exist yet
+        await db.exec(`
+            CREATE TABLE IF NOT EXISTS students (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
+                grade INTEGER NOT NULL,
+                role TEXT NOT NULL DEFAULT 'student',
+                grades_record TEXT DEFAULT '[]'
+            );
+            CREATE TABLE IF NOT EXISTS videos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL,
+                title TEXT NOT NULL,
+                lesson INTEGER NOT NULL,
+                grade INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS materials (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL,
+                title TEXT NOT NULL,
+                type TEXT NOT NULL,
+                desc TEXT,
+                grade INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS feed_posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                author TEXT NOT NULL,
+                date TEXT NOT NULL,
+                text TEXT,
+                attachment_name TEXT,
+                image_data TEXT
+            );
+            CREATE TABLE IF NOT EXISTS feed_comments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_id INTEGER NOT NULL,
+                author TEXT NOT NULL,
+                text TEXT NOT NULL
+            );
+        `);
+
+        // Router endpoints mapping
+        if (path === "/api/login-bypass" && method === "POST") {
+            const adminUser = { id: 9999, name: "Administrator", phone: "01000000000", grade: "all", role: "admin", grades_record: "[]" };
+            return new Response(JSON.stringify(adminUser), { headers: corsHeaders });
+        }
+
+        if (path === "/api/login" && method === "POST") {
+            const { username, password, role } = await request.json();
+            
+            if (role === "admin" && username === "admin" && password === "admin") {
+                const defaultAdmin = { id: 1000, name: "Admin (Default)", phone: "admin", grade: "all", role: "admin", grades_record: "[]" };
+                return new Response(JSON.stringify(defaultAdmin), { headers: corsHeaders });
+            }
+
+            const match = await db.prepare("SELECT * FROM students WHERE role = ? AND (phone = ? OR name = ?) AND password = ?").bind(role, username, username, password).first();
+            if (!match) {
+                return new Response(JSON.stringify({ error: "Access Denied: Unrecognized credentials verification." }), { status: 401, headers: corsHeaders });
+            }
+            return new Response(JSON.stringify(match), { headers: corsHeaders });
+        }
+
+        if (path === "/api/dashboard-stats" && method === "GET") {
+            const stats = await db.prepare("SELECT COUNT(*) as count FROM videos").first();
+            return new Response(JSON.stringify({ lectureCount: stats ? stats.count : 0 }), { headers: corsHeaders });
+        }
+
+        if (path === "/api/materials") {
+            if (method === "GET") {
+                const results = await db.prepare("SELECT * FROM materials ORDER BY id DESC").all();
+                return new Response(JSON.stringify(results.results), { headers: corsHeaders });
+            }
+            if (method === "POST") {
+                const { filename, title, type, desc, grade } = await request.json();
+                await db.prepare("INSERT INTO materials (filename, title, type, desc, grade) VALUES (?, ?, ?, ?, ?)")
+                    .bind(filename, title, type, desc, grade).run();
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+            }
+        }
+
+        if (path.startsWith("/api/materials/") && method === "DELETE") {
+            const id = path.split("/").pop();
+            await db.prepare("DELETE FROM materials WHERE id = ?").bind(id).run();
+            return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+        }
+
+        if (path === "/api/videos") {
+            if (method === "GET") {
+                const results = await db.prepare("SELECT * FROM videos ORDER BY id DESC").all();
+                return new Response(JSON.stringify(results.results), { headers: corsHeaders });
+            }
+            if (method === "POST") {
+                const { filename, title, lesson, grade } = await request.json();
+                await db.prepare("INSERT INTO videos (filename, title, lesson, grade) VALUES (?, ?, ?, ?)")
+                    .bind(filename, title, lesson, grade).run();
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+            }
+        }
+
+        if (path.startsWith("/api/videos/") && method === "DELETE") {
+            const id = path.split("/").pop();
+            await db.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
+            return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+        }
+
+        if (path === "/api/students") {
+            if (method === "GET") {
+                const results = await db.prepare("SELECT * FROM students ORDER BY name ASC").all();
+                return new Response(JSON.stringify(results.results), { headers: corsHeaders });
+            }
+            if (method === "POST") {
+                const { name, phone, password, grade } = await request.json();
+                await db.prepare("INSERT INTO students (name, phone, password, grade, role, grades_record) VALUES (?, ?, ?, ?, 'student', '[]')")
+                    .bind(name, phone, password, grade).run();
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+            }
+        }
+
+        if (path.startsWith("/api/students/")) {
+            const parts = path.split("/");
+            const id = parts[3];
+
+            if (parts.length === 4) {
+                if (method === "GET") {
+                    const student = await db.prepare("SELECT * FROM students WHERE id = ?").bind(id).first();
+                    return new Response(JSON.stringify(student), { headers: corsHeaders });
+                }
+                if (method === "PUT") {
+                    const { name, phone, password, grade } = await request.json();
+                    await db.prepare("UPDATE students SET name = ?, phone = ?, password = ?, grade = ? WHERE id = ?")
+                        .bind(name, phone, password, grade, id).run();
+                    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+                }
+                if (method === "DELETE") {
+                    await db.prepare("DELETE FROM students WHERE id = ?").bind(id).run();
+                    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+                }
+            }
+
+            if (parts.length === 5 && parts[4] === "toggle-admin" && method === "POST") {
+                const student = await db.prepare("SELECT role FROM students WHERE id = ?").bind(id).first();
+                const newRole = student.role === "admin" ? "student" : "admin";
+                await db.prepare("UPDATE students SET role = ? WHERE id = ?").bind(newRole, id).run();
+                return new Response(JSON.stringify({ message: `Role successfully updated to ${newRole}!` }), { headers: corsHeaders });
+            }
+        }
+
+        if (path === "/api/feed") {
+            if (method === "GET") {
+                const posts = await db.prepare("SELECT * FROM feed_posts ORDER BY id DESC").all();
+                const comments = await db.prepare("SELECT * FROM feed_comments ORDER BY id ASC").all();
+
+                const results = posts.results.map(post => {
+                    return {
+                        ...post,
+                        comments: comments.results.filter(c => c.post_id === post.id)
+                    };
+                });
+                return new Response(JSON.stringify(results), { headers: corsHeaders });
+            }
+            if (method === "POST") {
+                const { text, attachment_name, image_data } = await request.json();
+                const author = "MR. Ahmed Abd-ElFatah (Teacher)";
+                const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                
+                await db.prepare("INSERT INTO feed_posts (author, date, text, attachment_name, image_data) VALUES (?, ?, ?, ?, ?)")
+                    .bind(author, date, text, attachment_name, image_data).run();
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+            }
+        }
+
+        if (path.startsWith("/api/feed/") && path.endsWith("/comment") && method === "POST") {
+            const parts = path.split("/");
+            const postId = parts[3];
+            const { text } = await request.json();
+            const author = "Student User"; // Automatically maps to commenter details
+            
+            await db.prepare("INSERT INTO feed_comments (post_id, author, text) VALUES (?, ?, ?)")
+                .bind(postId, author, text).run();
+            return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+        }
+
+        if (path === "/api/sql" && method === "POST") {
+            const { query } = await request.json();
+            const results = await db.exec(query);
+            return new Response(JSON.stringify({ results }), { headers: corsHeaders });
+        }
+
+        if (path === "/api/chat" && method === "POST") {
+            const body = await request.json();
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer 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",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.1-8b-instant",
+                    messages: body.messages,
+                    temperature: 0.7
+                })
+            });
+            const data = await response.json();
+            return new Response(JSON.stringify(data), { headers: corsHeaders });
+        }
+
+        return new Response(JSON.stringify({ error: "Endpoint matching failure" }), { status: 404, headers: corsHeaders });
+
+    } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
+    }
+}
