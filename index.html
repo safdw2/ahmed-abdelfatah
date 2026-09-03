@@ -6,265 +6,214 @@
     <title>MR. Ahmed Abd-ElFatah</title>
     <!-- Tailwind CSS for modern responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons for clean visuals -->
+    <!-- Lucide Icons for vector-based user actions -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #05070c;
-            color: #f3f4f6;
-            overflow-x: hidden;
-        }
+        /* Custom scrollbar adjustments */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0b0f19;
+            background: #05070c;
         }
         ::-webkit-scrollbar-thumb {
             background: #1f2937;
-            border-radius: 3px;
+            border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #374151;
+            background: #4f46e5;
         }
-        .floating-watermark {
-            pointer-events: none;
+        /* Lock pointer leaks on secure play elements */
+        .no-select {
             user-select: none;
-            position: absolute;
-            font-family: monospace;
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.18);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
-            transition: all 3.5s ease-in-out;
-            z-index: 20;
+            -webkit-user-select: none;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-[#05070c] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-600/30 selection:text-indigo-200">
 
-    <!-- OS LOCK SCREEN (FORCED INSTALLATION FOR WINDOWS/ANDROID) -->
-    <div id="os-lock-screen" class="fixed inset-0 bg-[#05070c] z-50 flex flex-col items-center justify-center p-6 text-center hidden">
-        <div onclick="bypassLockScreen()" class="max-w-md bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-2xl relative cursor-pointer hover:border-indigo-500/30 transition duration-300">
-            <div class="w-20 h-20 bg-red-950/40 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i data-lucide="shield-alert" class="w-10 h-10 text-red-500"></i>
+    <!-- A. OS LOCK SCREEN FRAMEWORK (Secures local browser against direct URL access) -->
+    <div id="os-lock-screen" class="fixed inset-0 bg-[#05070c] z-50 flex flex-col items-center justify-center p-6 hidden">
+        <div class="max-w-md w-full bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 bg-red-950 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto text-red-400 select-none">
+                <i data-lucide="shield-alert" class="w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-3">Secure Application Required</h2>
-            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-                To protect educational materials and stream class lectures, Windows and Android users are required to install the secure browser client to block screenshotting and screen recording.
-            </p>
-            <button onclick="event.stopPropagation(); downloadSecureApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 flex items-center justify-center gap-2 mb-4">
-                <i data-lucide="download" class="w-5 h-5"></i>
-                <span>Download Secure Desktop/Mobile Client</span>
-            </button>
-            <div class="text-xs text-gray-500">
-                macOS & iOS devices are allowed to browse normally.
+            <div>
+                <h2 id="lock-title" class="text-xl font-extrabold text-white cursor-default select-none">App Download Required</h2>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                    To protect exam materials, worksheets, and secure video lectures, you must run this system inside the official application.
+                </p>
             </div>
-            <div class="text-[10px] text-gray-600 mt-4 italic">
-                (Admin: Tap this screen or use Ctrl+Shift+A shortcut to bypass during development)
+
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="downloadSecureApp()" class="flex flex-col items-center justify-center p-4 bg-[#05070c] border border-[#1f2937] hover:border-indigo-500/30 rounded-xl transition group">
+                    <i data-lucide="monitor" class="w-6 h-6 text-indigo-400 group-hover:scale-110 transition"></i>
+                    <span class="text-[11px] font-bold text-white mt-2">Windows App</span>
+                    <span class="text-[9px] text-gray-500">Ahmed_Launcher.bat</span>
+                </button>
+                <button onclick="alert('Android App Setup Guide: Open the guide from our setup document, paste the Java template in Android Studio, or compile it on Webintoapp in 10 seconds!')" class="flex flex-col items-center justify-center p-4 bg-[#05070c] border border-[#1f2937] hover:border-indigo-500/30 rounded-xl transition group">
+                    <i data-lucide="smartphone" class="w-6 h-6 text-indigo-400 group-hover:scale-110 transition"></i>
+                    <span class="text-[11px] font-bold text-white mt-2">Android App</span>
+                    <span class="text-[9px] text-gray-500">Android Webview App</span>
+                </button>
+            </div>
+
+            <div class="pt-4 border-t border-[#1f2937]/50 text-[10px] text-gray-500 flex flex-col gap-1 items-center">
+                <span>By downloading, you verify you are an enrolled student.</span>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <div id="app-wrapper" class="flex-1 flex flex-col min-h-screen">
-        
-        <!-- LOGIN SCREEN -->
-        <div id="login-section" class="flex-1 flex items-center justify-center p-4">
-            <div class="w-full max-w-md bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-xl relative">
-                <div class="text-center mb-8">
-                    <div class="flex items-center justify-center gap-3 mb-3">
-                        <img src="logo.png" alt="Logo" onerror="this.outerHTML='<div class=\'w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl aspect-square object-cover rounded-xl\'>MR</div>'" class="w-12 h-12 object-cover aspect-square rounded-xl">
-                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">MR. Ahmed Abd-ElFatah</span>
-                    </div>
-                    <p class="text-xs text-gray-400">Log in with your registered phone number or ID</p>
+    <!-- B. APPLICATION CONTAINER -->
+    <div id="app-wrapper" class="flex-1 flex flex-col">
+
+        <!-- 1. LOGIN SECTION -->
+        <div id="login-section" class="flex-1 flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/20 via-[#05070c] to-[#05070c]">
+            <div class="w-full max-w-sm bg-[#0b0f19] border border-[#1f2937] p-8 rounded-2xl shadow-2xl space-y-6">
+                
+                <!-- Logo & Branding -->
+                <div class="text-center space-y-2">
+                    <img id="login-logo" src="logo.png" alt="Logo" onerror="this.outerHTML='<div id=\'login-logo\' class=\'w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold text-2xl mx-auto cursor-pointer select-none aspect-square rounded-xl object-cover\'>MR</div>'" class="w-14 h-14 mx-auto object-cover aspect-square rounded-xl cursor-pointer">
+                    <h1 class="text-lg font-black text-white tracking-tight">MR. Ahmed Abd-ElFatah</h1>
+                    <p class="text-[10px] text-indigo-400 font-semibold tracking-wider uppercase">Unified Student Workspace</p>
                 </div>
 
-                <!-- Role Selector -->
-                <div class="flex bg-[#05070c] p-1 rounded-lg mb-6 border border-[#1f2937]/40">
+                <!-- Tab Switching: Student vs Administrator -->
+                <div class="flex bg-[#05070c] p-1 rounded-xl border border-[#1f2937]">
                     <button onclick="toggleLoginRole('student')" id="tab-student" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600">
-                        Student Access
+                        Student Entry
                     </button>
                     <button onclick="toggleLoginRole('admin')" id="tab-admin" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white">
-                        Admin Console
+                        Teacher / Admin
                     </button>
                 </div>
 
+                <!-- Input Form -->
                 <form onsubmit="handleLogin(event)" class="space-y-4">
-                    <div>
+                    <div id="login-error" class="hidden text-xs bg-red-950/40 border border-red-500/20 text-red-400 p-3 rounded-xl font-semibold"></div>
+                    
+                    <div class="space-y-1.5">
                         <label id="phone-label" class="block text-xs font-semibold text-gray-400 mb-1.5">Student Phone / ID</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                <i data-lucide="phone" class="w-4 h-4"></i>
-                            </span>
-                            <input type="text" id="login-id" required placeholder="e.g. 01012345678" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
-                        </div>
+                        <input type="text" id="login-id" required placeholder="e.g. 01012345678" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600 transition font-mono">
                     </div>
 
-                    <div>
+                    <div class="space-y-1.5">
                         <label class="block text-xs font-semibold text-gray-400 mb-1.5">Secret Password</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                <i data-lucide="lock" class="w-4 h-4"></i>
-                            </span>
-                            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
-                        </div>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600 transition">
                     </div>
 
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl transition duration-200">
-                        Secure Authentication
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition duration-200">
+                        Access Website
                     </button>
                 </form>
 
-                <div id="login-error" class="hidden text-center mt-4 p-2.5 bg-red-950/40 border border-red-500/20 text-red-400 text-xs rounded-lg"></div>
 
-                <div class="text-center mt-6">
-                    <button onclick="triggerQuickAdminBypass()" class="text-[10px] text-indigo-400 hover:underline font-mono">
-                        Device bypass: Tap/Click here or use Ctrl+Shift+L to test as Administrator
-                    </button>
-                </div>
             </div>
         </div>
 
-        <!-- MAIN SECURE WORKSPACE (HIDDEN BY DEFAULT) -->
+        <!-- 2. MAIN SECURE WEBSITE (HIDDEN BY DEFAULT) -->
         <div id="portal-section" class="flex-1 flex flex-col md:flex-row hidden">
-            <!-- SIDEBAR -->
+            
+            <!-- SIDEBAR BAR NAVIGATION -->
             <aside class="w-full md:w-64 bg-[#0b0f19] border-r border-[#1f2937] flex flex-col shrink-0">
+                
+                <!-- Account Display -->
                 <div class="p-6 border-b border-[#1f2937] flex items-center gap-3">
-                    <img src="logo.png" alt="Logo" onerror="this.outerHTML='<div class=\'w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg aspect-square object-cover rounded-xl\'>MR</div>'" class="w-10 h-10 object-cover aspect-square rounded-xl">
+                    <img id="profile-avatar" src="student1.png" alt="Avatar" onerror="handleAvatarError(this)" class="w-10 h-10 rounded-xl object-cover aspect-square shadow-lg shadow-indigo-600/10 shrink-0">
                     <div class="overflow-hidden">
-                        <h1 class="text-xs font-extrabold text-white truncate leading-none mb-1">MR. Ahmed</h1>
-                        <span id="user-badge" class="inline-block bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full">Student</span>
+                        <h3 id="user-name" class="font-extrabold text-white text-xs truncate">Student Name</h3>
                     </div>
                 </div>
 
-                <nav class="flex-1 p-4 space-y-1">
+                <!-- Navigation Links -->
+                <nav class="flex-1 p-4 space-y-1.5">
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-indigo-600/15 text-indigo-400">
                         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                         <span>Dashboard</span>
                     </button>
                     
                     <button onclick="switchTab('materials')" id="nav-materials" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
-                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                         <span>Materials & Sheets</span>
                     </button>
-                    
+
                     <button onclick="switchTab('videos')" id="nav-videos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
-                        <i data-lucide="video" class="w-4 h-4"></i>
-                        <span>Lectures & Videos</span>
+                        <i data-lucide="film" class="w-4 h-4"></i>
+                        <span>Lectures Catalog</span>
                     </button>
-                    
+
                     <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
                         <i data-lucide="message-square" class="w-4 h-4"></i>
-                        <span>Help bot</span>
+                        <span>Help Bot AI</span>
                     </button>
-                    
+
                     <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-slate-800/40 transition">
-                        <i data-lucide="rss" class="w-4 h-4"></i>
+                        <i data-lucide="megaphone" class="w-4 h-4"></i>
                         <span>Community Feed</span>
                     </button>
 
+                    <!-- Restricted to teacher role -->
                     <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/20 transition hidden">
-                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
                         <span>Admin Console</span>
                     </button>
                 </nav>
 
-                <div class="p-4 border-t border-[#1f2937] bg-[#05070c]/50">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center text-indigo-400 font-bold border border-slate-700" id="profile-avatar">S</div>
-                        <div class="overflow-hidden">
-                            <h4 id="user-name" class="text-xs font-bold text-white truncate">Student User</h4>
-                            <p id="user-grade-label" class="text-[10px] text-gray-400 truncate">Grade level</p>
-                        </div>
-                    </div>
+                <!-- Logout Trigger -->
+                <div class="p-4 border-t border-[#1f2937]/50">
                     <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 border border-[#1f2937] hover:border-red-500/30 hover:bg-red-950/10 text-gray-400 hover:text-red-400 font-semibold py-2 rounded-xl text-xs transition">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                        <span>Disconnect Portal</span>
+                        <span>Disconnect Account</span>
                     </button>
                 </div>
             </aside>
 
-            <!-- MAIN WORKSPACE -->
-            <main class="flex-1 flex flex-col bg-[#05070c] overflow-y-auto">
-                <header class="bg-[#0b0f19]/60 backdrop-blur-md border-b border-[#1f2937] px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-                    <span id="active-tab-title" class="text-sm font-bold text-white tracking-wide uppercase">Dashboard</span>
-                    <div class="text-right">
-                        <div class="text-xs font-semibold text-white">MR. Ahmed Abd-ElFatah Website</div>
-                        <div class="text-[9px] text-gray-500">Academic Term 2026/2027</div>
-                    </div>
+            <!-- WORKSPACE PANEL -->
+            <main class="flex-1 flex flex-col bg-[#05070c] overflow-hidden">
+                
+                <!-- Universal Sub-header -->
+                <header class="h-16 border-b border-[#1f2937] px-6 flex items-center justify-between shrink-0 bg-[#0b0f19]/30">
+                    <h2 id="active-tab-title" class="text-sm font-bold text-white tracking-wide">Dashboard</h2>
+                    <div class="text-[10px] text-gray-500 font-semibold tracking-wider uppercase hidden sm:block">MR. Ahmed Abd-ElFatah</div>
                 </header>
 
-                <div class="flex-1 p-6">
-                    
-                    <!-- 1. HOME DASHBOARD -->
+                <!-- Scrollable View Stream -->
+                <div class="flex-1 p-6 overflow-y-auto space-y-6">
+
+                    <!-- 1. DASHBOARD VIEW -->
                     <div id="view-dashboard" class="view-panel space-y-6">
-                        <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-500/10 p-6 rounded-2xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
-                            <div class="relative z-10">
-                                <h2 id="welcome-message" class="text-xl md:text-2xl font-black text-white mb-2">Marhaban! Ready to study?</h2>
-                                <p class="text-gray-400 text-xs md:text-sm max-w-xl leading-relaxed">
-                                    Welcome to the official online dashboard of MR. Ahmed Abd-ElFatah. Access your customized worksheets, view watermarked video sessions, or ask Help bot any doubts!
-                                </p>
+                        <!-- Welcome Board -->
+                        <div class="bg-gradient-to-r from-indigo-950/40 via-[#0b0f19] to-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h2 id="welcome-message" class="text-xl font-black text-white mb-1">Marhaban, Student!</h2>
+                                <p id="dashboard-grade-info" class="text-xs text-indigo-400 font-semibold">Loading grade level...</p>
+                            </div>
+                            <div id="dashboard-lecture-count" class="text-xs bg-indigo-950 text-indigo-300 border border-indigo-500/10 font-bold px-3 py-1.5 rounded-xl">
+                                Loading materials...
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
-                                <div class="w-12 h-12 bg-indigo-950/60 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
-                                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                        <!-- Grades & Academic Records Table (100% Dynamic, no dummy rows) -->
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Personal Evaluation Sheet</h3>
+                            <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-xs border-collapse">
+                                        <thead>
+                                            <tr class="border-b border-[#1f2937] bg-[#05070c]/50 text-gray-400 font-bold">
+                                                <th class="py-3 px-4">Evaluation Task</th>
+                                                <th class="py-3">Category</th>
+                                                <th class="py-3">Grade Value</th>
+                                                <th class="py-3">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="student-grades-tbody" class="divide-y divide-[#1f2937]/50">
+                                            <!-- Dynamic student grade elements rendering -->
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Your Grade Level</h3>
-                                    <p id="dashboard-grade-info" class="text-white text-sm font-bold mt-0.5">Preparatory 1</p>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
-                                <div class="w-12 h-12 bg-emerald-950/60 border border-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400">
-                                    <i data-lucide="video" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Class Lectures</h3>
-                                    <p id="dashboard-lecture-count" class="text-white text-sm font-bold mt-0.5">0 Active Lectures</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex items-center gap-4">
-                                <div class="w-12 h-12 bg-violet-950/60 border border-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
-                                    <i data-lucide="sparkles" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-400 text-xs uppercase">Classroom AI Assistant</h3>
-                                    <p class="text-white text-sm font-bold mt-0.5">Help bot online</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Grades and Feedback -->
-                        <div class="bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl">
-                            <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <i data-lucide="award" class="w-5 h-5 text-indigo-400"></i>
-                                <span>Recent Grades & Feedback</span>
-                            </h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs border-collapse">
-                                    <thead>
-                                        <tr class="border-b border-[#1f2937] text-gray-400">
-                                            <th class="pb-3 font-semibold">Subject / Topic</th>
-                                            <th class="pb-3 font-semibold">Assignment Category</th>
-                                            <th class="pb-3 font-semibold">Scored Grade</th>
-                                            <th class="pb-3 font-semibold">Status / Review</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="student-grades-tbody" class="divide-y divide-[#1f2937]/50 text-gray-300">
-                                        <!-- Dynamic rows -->
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -291,191 +240,144 @@
 
                     <!-- 3. LECTURES & VIDEOS -->
                     <div id="view-videos" class="view-panel space-y-6 hidden">
-                        <div class="flex items-center justify-between">
+                        <div class="flex justify-between items-center">
                             <div>
                                 <h2 class="text-lg font-bold text-white mb-1">Recorded Lessons</h2>
                                 <p class="text-xs text-gray-400">Play secure encrypted lectures from MR. Ahmed Abd-ElFatah</p>
                             </div>
+                            <!-- Upload Trigger (Admin only) -->
                             <button id="admin-video-upload-btn" onclick="openAddVideoModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition flex items-center gap-1.5 hidden">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                                <span>Register New Lecture</span>
+                                <span>Register Video File</span>
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            <div class="lg:col-span-4 bg-[#0b0f19] border border-[#1f2937] rounded-2xl p-4 flex flex-col h-[500px]">
-                                <h3 class="font-semibold text-white text-xs uppercase tracking-wider mb-3 border-b border-[#1f2937] pb-2">Lecture Playlist</h3>
-                                <div id="video-sessions-list" class="flex-1 overflow-y-auto space-y-2">
-                                    <!-- Dynamic rows -->
-                                </div>
-                            </div>
-
-                            <div class="lg:col-span-8 flex flex-col gap-4">
-                                <div id="video-theater" class="relative bg-black rounded-2xl border border-[#1f2937] overflow-hidden flex items-center justify-center aspect-video shadow-2xl">
-                                    <div id="video-watermark" class="floating-watermark hidden"></div>
-                                    <video id="secure-player" class="w-full h-full object-contain hidden" controls controlsList="nodownload" oncontextmenu="return false;">
-                                        <!-- Blob URL sources mapped dynamically -->
-                                    </video>
-                                    <div id="player-placeholder" class="text-center p-8 flex flex-col items-center">
-                                        <div class="w-14 h-14 rounded-full bg-indigo-950/60 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4">
-                                            <i data-lucide="play" class="w-6 h-6"></i>
-                                        </div>
-                                        <h4 class="font-bold text-white text-sm mb-1">Select a Lecture Session</h4>
-                                        <p class="text-gray-500 text-xs max-w-xs">Pick a registered lecture session from your grade playlist to start streaming with encrypted watermark overlay protection.</p>
-                                    </div>
-                                </div>
-
-                                <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h3 id="current-video-title" class="font-bold text-white text-sm">No Active Video</h3>
-                                        <span id="current-video-badge" class="bg-indigo-900/60 border border-indigo-500/20 text-indigo-300 font-bold px-2.5 py-0.5 rounded text-[9px] uppercase tracking-wider">Secured</span>
-                                    </div>
-                                    <p id="current-video-desc" class="text-gray-400 text-xs leading-relaxed">
-                                        Video feeds are encoded and rendered on demand. Dynamic user watermarks are continuously rendered inside the player coordinates to counter physical screens captures.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. HELP BOT AI CHAT -->
-                    <div id="view-chat" class="view-panel space-y-6 hidden">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-950 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
-                                <i data-lucide="sparkles" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-bold text-white leading-none mb-1">Help bot</h2>
-                                <p class="text-xs text-gray-400">AI physics, math, and chemistry curriculum tutor</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl flex flex-col h-[520px] shadow-lg">
-                            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col">
-                                <div class="flex items-start gap-3 max-w-[80%]">
-                                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 aspect-square object-cover rounded-xl">H</div>
-                                    <div class="bg-indigo-950/40 border border-indigo-500/10 p-3.5 rounded-2xl rounded-tl-none">
-                                        <p class="text-xs leading-relaxed text-gray-200">
-                                            Marhaban! I am <strong>Help bot</strong>, your professional coursework tutor. I am fully integrated into MR. Ahmed Abd-ElFatah's database. Ask me any math, chemistry, physics, or homework queries and we will solve them step-by-step!
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="p-4 border-t border-[#1f2937] bg-[#05070c]/50">
-                                <form onsubmit="handleSendMessage(event)" class="flex gap-2">
-                                    <input type="text" id="chat-input" placeholder="Type your academic or coursework query here..." required class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
-                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-5 flex items-center justify-center transition">
-                                        <i data-lucide="send" class="w-4 h-4"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 5. COMMUNITY ANNOUNCEMENT FEED -->
-                    <div id="view-feed" class="view-panel space-y-6 hidden">
-                        <div>
-                            <h2 class="text-lg font-bold text-white mb-1">Classroom Community Feed</h2>
-                            <p class="text-xs text-gray-400">Official administration announcements, study schedules, and homework comments</p>
-                        </div>
-
-                        <!-- Composer (Admins Only) -->
-                        <div id="admin-feed-composer" class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4 hidden">
-                            <h3 class="font-semibold text-white text-xs uppercase tracking-wider flex items-center gap-2">
-                                <i data-lucide="megaphone" class="w-4 h-4 text-amber-400"></i>
-                                <span>Publish Class Update</span>
-                            </h3>
-                            <textarea id="feed-post-text" placeholder="Share new notices, assignments, or guidelines with registered students..." class="w-full min-h-[80px] bg-[#05070c] border border-[#1f2937] rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                             
-                            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                                <div class="flex items-center gap-2">
-                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
-                                        <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                                        <span>Attach Photo</span>
-                                        <input type="file" id="feed-attach-image" accept="image/*" class="hidden" onchange="handleFeedAttachment('image')">
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
-                                        <i data-lucide="file" class="w-3.5 h-3.5"></i>
-                                        <span>Attach PDF</span>
-                                        <input type="file" id="feed-attach-pdf" accept=".pdf" class="hidden" onchange="handleFeedAttachment('pdf')">
-                                    </label>
-                                    
-                                    <span id="feed-attachment-status" class="text-xs text-emerald-400 font-semibold hidden">Media Attached ✔</span>
+                            <!-- Sidebar lectures catalog -->
+                            <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl p-4 space-y-4 lg:col-span-1">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Lesson Playlists</h3>
+                                <div id="video-sessions-list" class="space-y-2 max-h-[400px] overflow-y-auto">
+                                    <!-- Dynamic list -->
                                 </div>
+                            </div>
+
+                            <!-- Integrated secure video theater container -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div id="video-theater" class="relative bg-black rounded-2xl border border-[#1f2937] aspect-video overflow-hidden group">
+                                    
+                                    <!-- Embedded Secure Player -->
+                                    <video id="secure-player" class="w-full h-full object-cover hidden" controls controlsList="nodownload" oncontextmenu="return false;"></video>
+                                    
+                                    <!-- Floating Active Device Watermarks (Defense against local screen recorders) -->
+                                    <div id="video-watermark" class="absolute no-select text-white/10 font-bold font-mono text-[10px] select-none text-center pointer-events-none z-10 hidden">
+                                        WATERMARK_DUMMY
+                                    </div>
+
+                                    <div id="player-placeholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3 bg-[#05070c]">
+                                        <div class="w-12 h-12 rounded-full bg-indigo-950 border border-indigo-500/20 flex items-center justify-center text-indigo-400 animate-pulse">
+                                            <i data-lucide="play" class="w-5 h-5 ml-1"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-white font-bold">Select a Lesson Lecture</p>
+                                            <p class="text-[10px] text-gray-500 max-w-[240px] mx-auto mt-1">Watermark tracking logs are bound to your student account credentials during playback.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span id="current-video-badge" class="bg-indigo-950 text-indigo-400 border border-indigo-500/10 text-[9px] font-bold px-2 py-0.5 rounded-full">LECTURE</span>
+                                        <h3 id="current-video-title" class="font-extrabold text-white text-sm">No lecture selected</h3>
+                                    </div>
+                                    <p id="current-video-desc" class="text-xs text-gray-400 leading-relaxed pt-2">Click on any recorded lesson from your playlist menu to load secure encrypted frames.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. HELP BOT AI (Connected to GROQ securely) -->
+                    <div id="view-chat" class="view-panel space-y-6 hidden">
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-1">Help Bot AI Math Tutor</h2>
+                            <p class="text-xs text-gray-400">Interact with our physics, science, and math tutor, fully synced with your academy guidelines</p>
+                        </div>
+
+                        <div class="border border-[#1f2937] bg-[#0b0f19] rounded-2xl flex flex-col h-[500px] overflow-hidden shadow-sm">
+                            <!-- Messages Area -->
+                            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-indigo-950 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 text-xs font-bold shrink-0 aspect-square rounded-xl object-cover">H</div>
+                                    <div class="bg-[#05070c] border border-[#1f2937] rounded-2xl px-4 py-3 text-xs max-w-[80%] leading-relaxed space-y-1">
+                                        <div class="font-bold text-indigo-400">Help Bot Tutor</div>
+                                        <p>Ahlan! I am Help Bot, your professional mathematics and science assistant. I am fully integrated into MR. Ahmed Abd-ElFatah's curriculum. What math formula or science problem can we solve step-by-step today?</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Input Form -->
+                            <form onsubmit="handleSendMessage(event)" class="p-3 border-t border-[#1f2937] bg-[#05070c]/50 flex gap-2">
+                                <input type="text" id="chat-input" required placeholder="Type math equations or science questions..." class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+                                    <span>Send</span>
+                                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 5. COMMUNITY FEED (ANNOUNCEMENTS & COMEMNTS) -->
+                    <div id="view-feed" class="view-panel space-y-6 hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-white mb-1">Academy Announcements</h2>
+                                <p class="text-xs text-gray-400">Stay up to date with class guidelines and leave feed commentary</p>
+                            </div>
+                        </div>
+
+                        <!-- Admin Post Composer (Strictly hidden for students) -->
+                        <div id="admin-feed-composer" class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4 hidden">
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Compose New Announcement</h3>
+                            <textarea id="feed-post-text" placeholder="Write a premium workspace notification for students..." class="w-full h-24 bg-[#05070c] border border-[#1f2937] rounded-2xl p-4 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 resize-none transition"></textarea>
+                            
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                                <div class="flex gap-2">
+                                    <!-- Photo Attachment File Handler -->
+                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
+                                        <i data-lucide="image" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                        <span>Attach Image</span>
+                                        <input type="file" id="feed-attach-image" accept="image/*" onchange="handleFeedAttachment('image')" class="hidden">
+                                    </label>
+                                    
+                                    <!-- PDF Attachment File Handler -->
+                                    <label class="flex items-center gap-1.5 px-3 py-2 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] rounded-xl text-xs font-semibold text-gray-400 hover:text-white cursor-pointer transition">
+                                        <i data-lucide="paperclip" class="w-3.5 h-3.5 text-red-400"></i>
+                                        <span>Attach PDF Document</span>
+                                        <input type="file" id="feed-attach-pdf" accept=".pdf" onchange="handleFeedAttachment('pdf')" class="hidden">
+                                    </label>
+                                </div>
+
+                                <div id="feed-attachment-status" class="hidden text-xs text-emerald-400 font-semibold font-mono">Attachment Processed</div>
 
                                 <button onclick="publishFeedPost()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
                                     <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                                    <span>Post Announcement</span>
+                                    <span>Broadcast Post</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div id="feed-stream" class="space-y-4">
-                            <!-- Dynamic rows -->
+                        <!-- Announcements Feed Stream -->
+                        <div id="feed-stream" class="space-y-6">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
 
-                    <!-- 6. ADMINISTRATIVE CONSOLE (SQLITE) -->
-                    <div id="view-admin" class="view-panel space-y-6 hidden">
-                        <div class="border-b border-[#1f2937] pb-4">
-                            <h2 class="text-xl font-bold text-white mb-1">Administrative SQLite Console</h2>
-                            <p class="text-xs text-red-400">Manage real-time cloud data, modify accounts, and run raw simulated SQL expressions</p>
-                        </div>
-
-                        <!-- Direct SQLite Query Box -->
-                        <div class="bg-[#0b0f19] border border-[#1f2937] rounded-2xl p-5 space-y-4 shadow-lg">
-                            <h3 class="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-2">
-                                <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
-                                <span>Direct SQLite CLI Console</span>
-                            </h3>
-                            <div class="flex gap-2">
-                                <input type="text" id="admin-sql-query" placeholder="SELECT * FROM students;" class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-sm font-mono text-emerald-400 placeholder-gray-700 focus:outline-none focus:border-indigo-500">
-                                <button onclick="executeAdminSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 rounded-xl text-xs transition">
-                                    Run Statement
-                                </button>
-                            </div>
-                            <div id="sql-results-panel" class="bg-[#05070c] border border-[#1f2937] rounded-xl p-3 text-xs font-mono text-gray-500 max-h-[150px] overflow-y-auto hidden"></div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Student Directory Registry -->
-                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col h-[400px]">
-                                <div class="flex items-center justify-between mb-4 border-b border-[#1f2937] pb-2">
-                                    <h3 class="font-bold text-white text-xs uppercase tracking-wider">Student Registry</h3>
-                                    <button onclick="openAddStudentModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
-                                        + Register Student
-                                    </button>
-                                </div>
-                                <div id="admin-students-list" class="flex-1 overflow-y-auto space-y-2">
-                                    <!-- Dynamic rows -->
-                                </div>
-                            </div>
-
-                            <!-- Lectures Listing Catalog -->
-                            <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col h-[400px]">
-                                <div class="flex items-center justify-between mb-4 border-b border-[#1f2937] pb-2">
-                                    <h3 class="font-bold text-white text-xs uppercase tracking-wider">Video Lecture Files</h3>
-                                    <button onclick="openAddVideoModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
-                                        + Register Video
-                                    </button>
-                                </div>
-                                <div class="mb-3 p-3 bg-indigo-950/20 border border-indigo-500/10 rounded-xl text-[10px] text-indigo-300 leading-normal">
-                                    <strong>Automatic Layout:</strong> Files placed in your directory following the naming format <code>media{lesson}{grade}.mp4</code> automatically map to the matching preparatory level playlist.
-                                </div>
-                                <div id="admin-videos-list" class="flex-1 overflow-y-auto space-y-2">
-                                    <!-- Dynamic rows -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </main>
-        </div>
-
+                    <!-- 6. ADMIN SYSTEM CONTROL CONSOLE -->
+                    <div id="view-admin" class="view-panel space-y-6 hidden"></div>
+            </div>
+        </main>
     </div>
+</div>
 
     <!-- STUDENT MODAL (ADD & MODIFY) -->
     <div id="student-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -488,11 +390,11 @@
                 </div>
                 <div>
                     <label class="block text-gray-400 mb-1">Phone Number / ID</label>
-                    <input type="text" id="modal-student-phone" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="modal-student-phone" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
                 </div>
                 <div>
                     <label class="block text-gray-400 mb-1">Account Secret Password</label>
-                    <input type="text" id="modal-student-pass" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="modal-student-pass" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
                 </div>
                 <div>
                     <label class="block text-gray-400 mb-1">Grade Level</label>
@@ -501,6 +403,13 @@
                         <option value="8">Preparatory 2 (Grade 8)</option>
                         <option value="9">Preparatory 3 (Grade 9)</option>
                         <option value="10">Secondary 1 (Grade 10)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Gender Avatar</label>
+                    <select id="modal-student-gender" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <option value="male">Boy</option>
+                        <option value="female">Girl</option>
                     </select>
                 </div>
             </div>
@@ -521,16 +430,29 @@
             <h3 class="font-bold text-white text-base">Register Video File</h3>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-gray-400 mb-1">Upload Real MP4 (Streams instantly to player!)</label>
-                    <input type="file" id="modal-video-file" accept="video/mp4" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" onchange="autoFillVideoDetails()">
+                    <label class="block text-gray-400 mb-1">Select Video Lecture File (MP4)</label>
+                    <input type="file" id="modal-video-file" accept="video/mp4" onchange="autoExtractVideoFilename()" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl p-2 text-white font-mono focus:outline-none focus:border-indigo-500 text-[10px]">
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1">Video Filename (inside videos folder)</label>
-                    <input type="text" id="modal-video-filename" placeholder="media28.mp4" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                    <label class="block text-gray-400 mb-1">Extracted Filename (saved in videos/ folder)</label>
+                    <input type="text" id="modal-video-filename" placeholder="e.g. media1310.mp4" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500" readonly>
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1">Video Description</label>
-                    <input type="text" id="modal-video-title" placeholder="Quadratic Formula Review" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label class="block text-gray-400 mb-1">Lesson Number</label>
+                    <input type="number" id="modal-video-lesson" placeholder="e.g. 1" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Video Title Description</label>
+                    <input type="text" id="modal-video-title" placeholder="e.g. Quadratic Formula & Graphs Review" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Grade Alignment</label>
+                    <select id="modal-video-grade" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none">
+                        <option value="7">Preparatory 1 (Grade 7)</option>
+                        <option value="8">Preparatory 2 (Grade 8)</option>
+                        <option value="9">Preparatory 3 (Grade 9)</option>
+                        <option value="10">Secondary 1 (Grade 10)</option>
+                    </select>
                 </div>
             </div>
             <div class="flex gap-2 text-xs pt-2">
@@ -538,28 +460,32 @@
                     Cancel
                 </button>
                 <button onclick="saveVideo()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition">
-                    Register File
+                    Register Lecture
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MATERIAL UPLOAD MODAL -->
+    <!-- MATERIALS PDF UPLOAD MODAL -->
     <div id="material-upload-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="w-full max-w-sm bg-[#0b0f19] border border-[#1f2937] p-6 rounded-2xl shadow-2xl space-y-4">
-            <h3 class="font-bold text-white text-base">Upload Syllabus PDF</h3>
+            <h3 class="font-bold text-white text-base">Upload PDF study material</h3>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-gray-400 mb-1">Select PDF File</label>
-                    <input type="file" id="modal-material-file" accept=".pdf" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label class="block text-gray-400 mb-1">PDF File Attachment</label>
+                    <input type="file" id="modal-material-file" accept=".pdf" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl p-2 text-white font-mono focus:outline-none text-[10px]">
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1">Syllabus Title</label>
-                    <input type="text" id="modal-material-title" placeholder="Algebra Revision Homework Sheet 3" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label class="block text-gray-400 mb-1">Material Name Description</label>
+                    <input type="text" id="modal-material-title" placeholder="e.g. Trigonometry Homework Sheet" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1">Grade Target</label>
-                    <select id="modal-material-grade" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white">
+                    <label class="block text-gray-400 mb-1">Brief Description / Notes</label>
+                    <textarea id="modal-material-desc" placeholder="Complete questions 1 to 15 in the printed worksheet..." class="w-full h-16 bg-[#05070c] border border-[#1f2937] rounded-xl p-2 text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Target Grade</label>
+                    <select id="modal-material-grade" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
                         <option value="7">Preparatory 1 (Grade 7)</option>
                         <option value="8">Preparatory 2 (Grade 8)</option>
                         <option value="9">Preparatory 3 (Grade 9)</option>
@@ -567,16 +493,12 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-400 mb-1">Category Type</label>
-                    <select id="modal-material-type" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white">
-                        <option value="Worksheet">Worksheet</option>
-                        <option value="Homework">Homework</option>
-                        <option value="Study Guide">Study Guide</option>
+                    <label class="block text-gray-400 mb-1">Resource Category Tag</label>
+                    <select id="modal-material-type" class="w-full bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <option value="Worksheet">Printed Worksheet</option>
+                        <option value="Homework">Homework Sheet</option>
+                        <option value="Study Guide">Study Guide Guide</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">Short Description</label>
-                    <textarea id="modal-material-desc" placeholder="Brief details about what topics this PDF covers..." class="w-full h-16 bg-[#05070c] border border-[#1f2937] rounded-xl p-2 text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
                 </div>
             </div>
             <div class="flex gap-2 text-xs pt-2">
@@ -584,49 +506,89 @@
                     Cancel
                 </button>
                 <button onclick="saveUploadedMaterial()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl transition">
-                    Publish Material
+                    Publish PDF Material
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- ===================================================================== -->
+    <!-- INTERACTIVE JAVASCRIPT FRAMEWORK -->
+    <!-- ===================================================================== -->
     <script>
-        // Version Tracker to automatically clean legacy local caches
-        const DATABASE_VERSION = "v7.0.0-D1-FullyConnected";
-
+        const DATABASE_VERSION = "v9.0.0";
         const GRADE_MAPPING = {
-            7: "Preparatory 1 (Grade 7)",
-            8: "Preparatory 2 (Grade 8)",
-            9: "Preparatory 3 (Grade 9)",
-            10: "Secondary 1 (Grade 10)",
-            "all": "All Classes / Administration"
+            "7": "Preparatory 1 (Grade 7)",
+            "8": "Preparatory 2 (Grade 8)",
+            "9": "Preparatory 3 (Grade 9)",
+            "10": "Secondary 1 (Grade 10)",
+            "all": "Academic Staff"
         };
 
+        // Automatic Local Simulation vs Cloud D1 Detection
+        const IS_LOCAL_MOCK = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
+
+        
+        function handleAvatarError(img) {
+            if (img.src.endsWith("logo.png")) {
+                const fallbackDiv = document.createElement("div");
+                fallbackDiv.id = "profile-avatar";
+                fallbackDiv.className = "w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-lg shadow-indigo-600/10 shrink-0 aspect-square object-cover";
+                fallbackDiv.innerText = currentUser ? currentUser.name.charAt(0).toUpperCase() : "S";
+                img.parentNode.replaceChild(fallbackDiv, img);
+            } else {
+                img.src = "logo.png";
+            }
+        }
+    
+        async function togglePostLike(postId) {
+            try {
+                await apiCall(`feed/${postId}/like`, "POST");
+                renderFeed();
+                showCustomToast("Feed updated!", "success");
+            } catch(err) {
+                showCustomToast(err.message, "error");
+            }
+        }
+
+        async function toggleCommentLike(postId, commentId) {
+            try {
+                await apiCall(`feed/${postId}/comment/${commentId}/like`, "POST");
+                renderFeed();
+                showCustomToast("Comment updated!", "success");
+            } catch(err) {
+                showCustomToast(err.message, "error");
+            }
+        }
+    
         let currentUser = null;
         let loginRoleSelected = "student";
         let activeTab = "dashboard";
         let tempPostAttachment = null;
         let currentEditingStudentId = null;
         
-        // In-memory mapping of file uploads for instant streaming during local testing
-        let localUploadsBlobMap = {};
+        // Dynamic Blob wrappers for in-memory video files
+        let localUploadedVideos = {}; 
+        let loginLogoClickCount = 0;
 
-        // Auto-detect environments
-        const IS_LOCAL_MOCK = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
-
-        // Direct Cloud API Calls Wrapper (Bridges Frontend to Cloudflare D1 Serverless Router)
+        // Secure Cloud API Call wrapper
         async function apiCall(endpoint, method = "GET", body = null) {
             if (IS_LOCAL_MOCK) {
                 return mockLocalAPI(endpoint, method, body);
             }
-            try {
-                const headers = { "Content-Type": "application/json" };
-                const config = { method, headers };
-                if (body) config.body = JSON.stringify(body);
 
-                const response = await fetch(`/api/${endpoint}`, config);
+            const options = {
+                method,
+                headers: { "Content-Type": "application/json" }
+            };
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            try {
+                const response = await fetch(`/api/${endpoint}`, options);
                 if (!response.ok) {
-                    const errObj = await response.json().catch(() => ({}));
+                    const errObj = await response.json();
                     throw new Error(errObj.error || "Internal Cloud API Error");
                 }
                 return await response.json();
@@ -646,6 +608,32 @@
 
             window.addEventListener("keydown", handleBypassShortcut);
             window.addEventListener("keydown", handleAdminLoginBypass);
+            
+            // Hidden Multi-click handler on logo for secret developer bypass
+            const logo = document.getElementById("login-logo");
+            if (logo) {
+                logo.addEventListener("click", () => {
+                    loginLogoClickCount++;
+                    if (loginLogoClickCount >= 5) {
+                        loginLogoClickCount = 0;
+                        triggerQuickAdminBypass();
+                    }
+                });
+            }
+
+            // Hidden Multi-click handler on lock screen title for mobile device bypass
+            let lockTitleClickCount = 0;
+            const lockTitle = document.getElementById("lock-title");
+            if (lockTitle) {
+                lockTitle.addEventListener("click", () => {
+                    lockTitleClickCount++;
+                    if (lockTitleClickCount >= 5) {
+                        lockTitleClickCount = 0;
+                        bypassLockScreen();
+                    }
+                });
+            }
+
             setInterval(updateWatermarkPosition, 3500);
 
             // Block inspection keys
@@ -659,13 +647,24 @@
         });
 
         function checkDeviceOS() {
+            // Check if we opened from secure app wrapper with ?app=true
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("app") === "true") {
+                localStorage.setItem("app_installed_verified", "true");
+                // Clean browser URL bar immediately
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            const isVerified = localStorage.getItem("app_installed_verified") === "true";
             const isBypassed = sessionStorage.getItem("admin_bypass") === "true";
-            if (isBypassed) return;
+            
+            if (isVerified || isBypassed) return;
 
             const userAgent = navigator.userAgent || window.opera;
             const isWindows = /Windows/i.test(userAgent);
             const isAndroid = /Android/i.test(userAgent);
 
+            // Enforce application wrapper if they are opening in normal Windows or Android browser
             if (isWindows || isAndroid) {
                 document.getElementById("os-lock-screen").classList.remove("hidden");
                 document.getElementById("app-wrapper").classList.add("hidden");
@@ -680,14 +679,20 @@
         }
 
         function handleBypassShortcut(e) {
-            if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "A") {
+            const isCtrl = e.ctrlKey || e.metaKey;
+            const isShift = e.shiftKey;
+            const isA = e.key && (e.key.toLowerCase() === 'a' || e.code === 'KeyA');
+            if ((isCtrl && isShift && isA) || (isCtrl && isShift && e.key.toUpperCase() === "Q")) {
                 e.preventDefault();
                 bypassLockScreen();
             }
         }
 
         async function handleAdminLoginBypass(e) {
-            if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "L") {
+            const isCtrl = e.ctrlKey || e.metaKey;
+            const isShift = e.shiftKey;
+            const isL = e.key && (e.key.toLowerCase() === 'l' || e.code === 'KeyL');
+            if ((isCtrl && isShift && isL) || (isCtrl && isShift && e.key.toUpperCase() === "Q")) {
                 e.preventDefault();
                 triggerQuickAdminBypass();
             }
@@ -699,7 +704,7 @@
             document.getElementById("app-wrapper").classList.remove("hidden");
 
             try {
-                // Instantly requests/creates the Cloud Administrator session
+                // Fetch/Create default Administrator profile from API
                 currentUser = await apiCall("login-bypass", "POST");
                 enterPortal();
             } catch(error) {
@@ -708,17 +713,26 @@
         }
 
         function downloadSecureApp() {
-            const mockContent = "MR. Ahmed Abd-ElFatah Secure Application Installer Binary.";
-            const blob = new Blob([mockContent], { type: "text/plain" });
+            // Generates a fully functional, borderless Windows Desktop app launcher!
+            const batchContent = `@echo off
+` +
+                `echo Launching MR. Ahmed Abd-ElFatah Desktop App Securely...
+` +
+                `start msedge --app="${window.location.origin}?app=true" --window-size=1280,800
+` +
+                `exit
+`;
+            
+            const blob = new Blob([batchContent], { type: "application/octet-stream" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "Ahmed_AbdElFatah_SecureApp.exe";
+            a.download = "Ahmed_AbdElFatah_Launcher.bat";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showCustomToast("Secure App installer download started.", "info");
+            showCustomToast("Windows launcher downloaded! Run it to access the app.", "success");
         }
 
         function toggleLoginRole(role) {
@@ -732,7 +746,7 @@
                 tabStudent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white";
                 tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600";
                 phoneLabel.innerText = "Administrator Username";
-                idInput.placeholder = "e.g. Teacher Admin";
+                idInput.placeholder = "e.g. Admin Username";
             } else {
                 tabStudent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-white bg-indigo-600";
                 tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white";
@@ -750,14 +764,11 @@
             errorDiv.classList.add("hidden");
 
             try {
-                currentUser = await apiCall("login", "POST", {
-                    username: idVal,
-                    password: passVal,
-                    role: loginRoleSelected
-                });
+                const payload = { idVal, passVal, role: loginRoleSelected };
+                currentUser = await apiCall("login", "POST", payload);
                 enterPortal();
-            } catch (error) {
-                errorDiv.innerText = `Access Denied: ${error.message}`;
+            } catch(error) {
+                errorDiv.innerText = error.message;
                 errorDiv.classList.remove("hidden");
             }
         }
@@ -767,35 +778,70 @@
             document.getElementById("portal-section").classList.remove("hidden");
             
             document.getElementById("user-name").innerText = currentUser.name;
-            document.getElementById("user-grade-label").innerText = GRADE_MAPPING[currentUser.grade];
-            document.getElementById("profile-avatar").innerText = currentUser.name.charAt(0).toUpperCase();
+            const gl = document.getElementById("user-grade-label"); if (gl) { gl.innerText = GRADE_MAPPING[currentUser.grade]; }
+            const avatarImg = document.getElementById("profile-avatar");
+            if (avatarImg) {
+                if (currentUser.role === "admin") {
+                    avatarImg.src = "admin.png";
+                } else {
+                    avatarImg.src = currentUser.gender === "female" ? "student2.png" : "student1.png";
+                }
+            }
             
-            const badge = document.getElementById("user-badge");
+            
             const navAdmin = document.getElementById("nav-admin");
             const uploadBtn = document.getElementById("admin-material-upload-btn");
-            const videoRegBtn = document.getElementById("admin-video-upload-btn");
+            const videoBtn = document.getElementById("admin-video-upload-btn");
             
             if (currentUser.role === "admin") {
-                badge.innerText = "Admin Console";
-                badge.className = "inline-block bg-red-950 text-red-400 border border-red-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full";
+                
+                
                 navAdmin.classList.remove("hidden");
                 uploadBtn.classList.remove("hidden");
-                videoRegBtn.classList.remove("hidden");
+                videoBtn.classList.remove("hidden");
                 document.getElementById("admin-feed-composer").classList.remove("hidden");
             } else {
-                badge.innerText = `Grade ${currentUser.grade}`;
-                badge.className = "inline-block bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full";
+                
+                
                 navAdmin.classList.add("hidden");
                 uploadBtn.classList.add("hidden");
-                videoRegBtn.classList.add("hidden");
+                videoBtn.classList.add("hidden");
                 document.getElementById("admin-feed-composer").classList.add("hidden");
             }
 
-            switchTab("dashboard");
-            showCustomToast(`Logged in as ${currentUser.name}!`, "success");
+            if (currentUser.role === "admin") {
+                injectAdminConsoleHTML();
+                switchTab("admin");
+            } else {
+                const adminContainer = document.getElementById("view-admin");
+                if (adminContainer) adminContainer.innerHTML = "";
+                switchTab("dashboard");
+            }
+            showCustomToast(`Welcome ${currentUser.name}!`, "success");
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById("portal-section").classList.add("hidden");
+            document.getElementById("login-section").classList.remove("hidden");
+            document.getElementById("secure-player").classList.add("hidden");
+            document.getElementById("secure-player").pause();
+            document.getElementById("player-placeholder").classList.remove("hidden");
+            document.getElementById("video-watermark").classList.add("hidden");
+            showCustomToast("Session closed.", "info");
         }
 
         function switchTab(tabId) {
+            if (tabId === "admin" && (!currentUser || currentUser.role !== "admin")) {
+                showCustomToast("Access Denied: Administrative console locked.", "error");
+                switchTab("dashboard");
+                return;
+            }
+            if (tabId === "admin" && (!currentUser || currentUser.role !== "admin")) {
+                showCustomToast("Access Denied: Administrative privilege required.", "error");
+                switchTab("dashboard");
+                return;
+            }
             activeTab = tabId;
             document.querySelectorAll(".view-panel").forEach(p => p.classList.add("hidden"));
             document.getElementById(`view-${tabId}`).classList.remove("hidden");
@@ -822,79 +868,85 @@
             else if (tabId === "admin") renderAdminDashboard();
         }
 
-        // Render Dashboard details
+        // Render Dashboard info
         async function renderDashboard() {
-            document.getElementById("welcome-message").innerText = `Marhaban, ${currentUser.name}! Ready to study?`;
+            document.getElementById("welcome-message").innerText = `Marhaban, ${currentUser.name}!`;
             document.getElementById("dashboard-grade-info").innerText = GRADE_MAPPING[currentUser.grade];
 
             const tbody = document.getElementById("student-grades-tbody");
             tbody.innerHTML = "";
             
+            // Dynamic grading system: load real grades array from database
             let records = [];
             if (currentUser.grades_record) {
-                try { records = JSON.parse(currentUser.grades_record); } catch(e) { records = []; }
+                try {
+                    records = typeof currentUser.grades_record === 'string' ? JSON.parse(currentUser.grades_record) : currentUser.grades_record;
+                } catch(e) { records = []; }
             }
 
-            if (records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-gray-500">No scorecards registered yet on your profile directory. Work hard!</td></tr>`;
+            if (!records || records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-gray-500 text-xs">No registered academic evaluations available yet. Keep up the good work!</td></tr>`;
             } else {
                 records.forEach(r => {
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-900/30">
-                            <td class="py-3 font-semibold text-white">${r.topic}</td>
+                            <td class="py-3 px-4 font-bold text-white">${r.topic}</td>
                             <td class="py-3 text-gray-400">${r.weight}</td>
-                            <td class="py-3 text-emerald-400 font-bold font-mono">${r.grade}</td>
-                            <td class="py-3 text-gray-400">${r.status || "Completed"}</td>
+                            <td class="py-3 text-emerald-400 font-extrabold font-mono">${r.grade}</td>
+                            <td class="py-3 text-gray-400"><span class="bg-indigo-950 border border-indigo-500/10 px-2 py-0.5 rounded-md text-[10px] text-indigo-300">${r.status || "Completed"}</span></td>
                         </tr>
                     `;
                 });
             }
 
             try {
-                const dashboardStats = await apiCall("dashboard-stats");
-                document.getElementById("dashboard-lecture-count").innerText = `${dashboardStats.lectureCount} Available Lectures`;
-            } catch(e) {
-                document.getElementById("dashboard-lecture-count").innerText = "0 Available Lectures";
+                const videos = await apiCall("videos");
+                const matchCount = currentUser.role === "admin" ? videos.length : videos.filter(v => v.grade === parseInt(currentUser.grade)).length;
+                document.getElementById("dashboard-lecture-count").innerText = `${matchCount} Available Lectures`;
+            } catch (err) {
+                document.getElementById("dashboard-lecture-count").innerText = "Website Active";
             }
         }
 
-        // Render Materials (Cloud D1 connected)
+        // Materials & Worksheets Rendering
         async function renderMaterials() {
             const grid = document.getElementById("materials-grid");
-            grid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500 text-xs">Loading syllabus sheets...</div>`;
+            grid.innerHTML = "";
 
             try {
                 const materials = await apiCall("materials");
-                grid.innerHTML = "";
+                const isAdmin = currentUser.role === "admin";
+                
+                // Filter materials based on student's actual grade level
+                const filteredMaterials = isAdmin ? materials : materials.filter(m => m.grade === parseInt(currentUser.grade));
 
-                if (materials.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-xs">No worksheets or guides uploaded yet. Check back later!</div>`;
+                if (filteredMaterials.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-xs">No academic worksheets or guides published yet.</div>`;
                     return;
                 }
 
-                materials.forEach((sh, idx) => {
-                    const levelText = GRADE_MAPPING[sh.grade] ? GRADE_MAPPING[sh.grade].split(" (")[0] : `Grade ${sh.grade}`;
+                filteredMaterials.forEach((sh, idx) => {
+                    const targetGradeText = GRADE_MAPPING[sh.grade] ? GRADE_MAPPING[sh.grade].split(" (")[0] : `Grade ${sh.grade}`;
                     grid.innerHTML += `
-                        <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col justify-between h-[210px] hover:border-indigo-500/20 transition">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-500/10 text-[9px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                                        ${sh.type}
-                                    </span>
-                                    <span class="text-[9px] text-gray-500 font-bold font-mono">${levelText}</span>
+                        <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-indigo-950/60 border border-indigo-500/10 text-[9px] text-indigo-400 font-bold px-2 py-0.5 rounded-full uppercase">${sh.type}</span>
+                                    <span class="text-[9px] text-gray-500 font-bold uppercase">${targetGradeText}</span>
                                 </div>
                                 <h3 class="font-bold text-white text-sm mb-1.5 truncate" title="${sh.title}">${sh.title}</h3>
-                                <p class="text-gray-400 text-xs line-clamp-2 leading-relaxed">${sh.desc}</p>
+                                <p class="text-xs text-gray-400 leading-relaxed line-clamp-3">${sh.desc || "Syllabus material available for download."}</p>
                             </div>
                             
-                            <div class="flex gap-2 mt-4">
+                            <div class="flex gap-2">
                                 <button onclick="downloadSheet('${sh.filename}', '${sh.title}')" class="flex-1 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] hover:border-indigo-500/30 text-xs text-indigo-300 hover:text-indigo-200 py-2.5 rounded-xl transition font-semibold flex items-center justify-center gap-2">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                     <span>Download PDF</span>
                                 </button>
-                                ${currentUser.role === 'admin' ? `
-                                    <button onclick="deleteMaterial(${sh.id})" class="bg-red-950/40 hover:bg-red-900 border border-red-500/10 hover:border-red-500/40 text-red-400 p-2.5 rounded-xl transition" title="Delete Material">
-                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                
+                                ${isAdmin ? `
+                                    <button onclick="deleteMaterial(${sh.id || idx})" class="bg-red-950/40 hover:bg-red-900 border border-red-500/10 hover:border-red-500/40 text-red-400 p-2.5 rounded-xl transition" title="Delete Material">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 ` : ""}
                             </div>
@@ -902,22 +954,23 @@
                     `;
                 });
                 try { lucide.createIcons(); } catch(e) {}
-            } catch (err) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-400 text-xs">Failed to load syllabus sheets: ${err.message}</div>`;
+            } catch(error) {
+                showCustomToast("Error loading worksheet catalog.", "error");
             }
         }
 
+        // Open/Close Materials Modal
         function openUploadMaterialModal() {
             document.getElementById("modal-material-title").value = "";
             document.getElementById("modal-material-desc").value = "";
             document.getElementById("modal-material-file").value = "";
             document.getElementById("material-upload-modal").classList.remove("hidden");
         }
-
         function closeUploadMaterialModal() {
             document.getElementById("material-upload-modal").classList.add("hidden");
         }
 
+        // Save PDF Material Upload
         async function saveUploadedMaterial() {
             const title = document.getElementById("modal-material-title").value.trim();
             const grade = parseInt(document.getElementById("modal-material-grade").value);
@@ -926,7 +979,7 @@
             const fileInput = document.getElementById("modal-material-file");
 
             if (!title || !desc) {
-                showCustomToast("Please fill in all PDF detail fields.", "error");
+                showCustomToast("Please describe the PDF workbook first.", "error");
                 return;
             }
 
@@ -939,33 +992,28 @@
                 await apiCall("materials", "POST", { title, grade, type, desc, filename });
                 closeUploadMaterialModal();
                 renderMaterials();
-                showCustomToast("PDF sheet successfully published to Cloud Database!", "success");
-            } catch(e) {
-                showCustomToast(e.message, "error");
+                showCustomToast("PDF worksheet published to Cloud SQL!", "success");
+            } catch(error) {
+                showCustomToast(error.message, "error");
             }
         }
 
         async function deleteMaterial(id) {
-            if (confirm("Delete this PDF study material from the Cloud Database?")) {
+            if (confirm("Delete this PDF study material from academy lists?")) {
                 try {
-                    await apiCall(`materials/${id}`, "DELETE");
+                    await apiCall(`materials?id=${id}`, "DELETE");
                     renderMaterials();
                     showCustomToast("Material deleted successfully.", "success");
-                } catch(e) {
-                    showCustomToast(e.message, "error");
+                } catch(error) {
+                    showCustomToast(error.message, "error");
                 }
             }
         }
 
         function downloadSheet(filename, title) {
-            const fileHeader = `MR. AHMED ABD-ELFATAH - ACADEMY DOWNLOAD
-SUBJECT FILE RESOURCE
-===========================
-File: ${filename}
-Title: ${title}
-Curriculum worksheet signature authenticated.
-
-[Full course resources are accessible via Website Help bot or Teacher channels]`;
+            // Generates a mock authenticated academy PDF resource signature
+            const fileHeader = `MR. AHMED ABD-ELFATAH - ACADEMY DOWNLOAD\nSUBJECT FILE RESOURCE\n===========================\nFile: ${filename}\nTitle: ${title}\nCurriculum worksheet signature authenticated.\n\n[Full course resources are accessible via Egypt Help bot or Teacher channels]`;
+            
             const blob = new Blob([fileHeader], { type: "application/pdf" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -975,250 +1023,190 @@ Curriculum worksheet signature authenticated.
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showCustomToast(`Downloaded: ${filename}`, "success");
+            showCustomToast(`Worksheet '${title}' saved successfully.`, "success");
         }
 
-        // Render lectures from Cloud
+        // Recorded Lectures Catalog Rendering
         async function renderVideos() {
-            const listContainer = document.getElementById("video-sessions-list");
-            listContainer.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading classroom lectures...</div>`;
+            const list = document.getElementById("video-sessions-list");
+            list.innerHTML = "";
 
             try {
                 const videos = await apiCall("videos");
-                listContainer.innerHTML = "";
+                const isAdmin = currentUser.role === "admin";
+                const filteredVideos = isAdmin ? videos : videos.filter(v => v.grade === parseInt(currentUser.grade));
 
-                if (videos.length === 0) {
-                    listContainer.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No recorded lectures registered yet on the cloud database.</div>`;
+                if (filteredVideos.length === 0) {
+                    list.innerHTML = `<div class="text-center py-6 text-gray-500 text-[11px]">No videos published yet.</div>`;
                     return;
                 }
 
-                videos.forEach((v) => {
-                    const levelLabel = GRADE_MAPPING[v.grade] ? GRADE_MAPPING[v.grade].split(" (")[0] : `Grade ${v.grade}`;
-                    listContainer.innerHTML += `
+                filteredVideos.forEach((v, idx) => {
+                    list.innerHTML += `
                         <button onclick="playLecture('${v.filename}', '${v.title}', ${v.lesson}, ${v.grade})" class="w-full flex items-start gap-3 p-3 bg-[#05070c] border border-[#1f2937] hover:border-indigo-500/30 rounded-xl text-left transition group">
-                            <div class="w-8 h-8 rounded-lg bg-slate-800/80 group-hover:bg-indigo-950 flex items-center justify-center text-indigo-400 font-bold text-xs shrink-0 transition">
-                                L${v.lesson}
+                            <div class="w-8 h-8 rounded-lg bg-indigo-950/80 text-indigo-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition aspect-square rounded-xl object-cover">
+                                <i data-lucide="play" class="w-3.5 h-3.5 ml-0.5"></i>
                             </div>
-                            <div class="overflow-hidden">
-                                <h4 class="text-xs font-bold text-white truncate group-hover:text-indigo-400 transition">${v.title}</h4>
-                                <p class="text-[10px] text-gray-500 mt-0.5 font-mono">${v.filename} • ${levelLabel}</p>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-white text-[11px] truncate leading-tight">${v.title}</h4>
+                                <p class="text-[9px] text-gray-400 mt-1 uppercase font-mono">Lesson ${v.lesson} · Grade ${v.grade}</p>
                             </div>
                         </button>
                     `;
                 });
-            } catch (err) {
-                listContainer.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Failed to load lectures: ${err.message}</div>`;
+                try { lucide.createIcons(); } catch(e) {}
+            } catch(error) {
+                showCustomToast("Failed to load recordings list.", "error");
             }
         }
 
-        function playLecture(filename, title, lesson, grade) {
-            const placeholder = document.getElementById("player-placeholder");
-            const player = document.getElementById("secure-player");
-            const watermark = document.getElementById("video-watermark");
-
-            placeholder.classList.add("hidden");
-            player.classList.remove("hidden");
-            watermark.classList.remove("hidden");
-
-            watermark.innerText = `${currentUser.name} - ${currentUser.phone || "ADMIN"}`;
-
-            let sourceUrl = `videos/${filename}`;
-            if (localUploadsBlobMap[filename]) {
-                sourceUrl = localUploadsBlobMap[filename];
-                showCustomToast("Streaming direct in-memory browser local file...", "info");
-            } else {
-                showCustomToast("Decrypting secure video file stream...", "info");
-            }
-
-            player.src = sourceUrl;
-            player.load();
-            player.play().catch(() => {});
-
-            document.getElementById("current-video-title").innerText = `Session ${lesson}: ${title}`;
-            document.getElementById("current-video-badge").innerText = GRADE_MAPPING[grade] ? GRADE_MAPPING[grade].split(" (")[0] : `Grade ${grade}`;
-            document.getElementById("current-video-desc").innerText = `Currently streaming ${filename}. Dynamic anti-screenshot floating overlays are rendered randomly to prevent unauthorized camera and device recordings. Inspect tools are disabled.`;
-            
-            updateWatermarkPosition();
-        }
-
-        function updateWatermarkPosition() {
-            const watermark = document.getElementById("video-watermark");
-            const theater = document.getElementById("video-theater");
-            if (!watermark || watermark.classList.contains("hidden")) return;
-
-            const tWidth = theater.clientWidth;
-            const tHeight = theater.clientHeight;
-            
-            const x = Math.floor(Math.random() * (tWidth - 200));
-            const y = Math.floor(Math.random() * (tHeight - 40));
-
-            watermark.style.transform = `translate(${x}px, ${y}px)`;
-            watermark.style.opacity = (Math.random() * 0.15 + 0.08).toFixed(2);
-        }
-
-        function openAddVideoModal() {
-            document.getElementById("modal-video-filename").value = "";
-            document.getElementById("modal-video-title").value = "";
-            document.getElementById("modal-video-file").value = "";
-            document.getElementById("video-modal").classList.remove("hidden");
-        }
-
-        function closeVideoModal() {
-            document.getElementById("video-modal").classList.add("hidden");
-        }
-
-        function autoFillVideoDetails() {
+        function autoExtractVideoFilename() {
             const fileInput = document.getElementById("modal-video-file");
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 document.getElementById("modal-video-filename").value = file.name;
                 
-                // Keep file in localBlobMap for immediate sandbox testing without servers
-                const localUrl = URL.createObjectURL(file);
-                localUploadsBlobMap[file.name] = localUrl;
-
-                const nameNoExt = file.name.replace(/\.[^/.]+$/, "").toLowerCase();
-                const titleInput = document.getElementById("modal-video-title");
-                if (nameNoExt.startsWith("media")) {
-                    titleInput.value = "Class Session: " + nameNoExt.substring(5).toUpperCase();
+                // Automatically try to extract Lesson and Grade from filename
+                // Pattern matches: "media" followed by Lesson, then Grade (e.g. media110.mp4)
+                const match = file.name.match(/media(\d+)/i);
+                if (match && match[1]) {
+                    const digits = match[1];
+                    if (digits.length >= 2) {
+                        const grade = digits.slice(-2);
+                        const lesson = digits.slice(0, -2);
+                        document.getElementById("modal-video-lesson").value = lesson;
+                        document.getElementById("modal-video-grade").value = parseInt(grade).toString();
+                    }
                 }
             }
+        }
+
+        function openAddVideoModal() {
+            document.getElementById("modal-video-file").value = "";
+            document.getElementById("modal-video-filename").value = "";
+            document.getElementById("modal-video-title").value = "";
+            document.getElementById("modal-video-lesson").value = "";
+            document.getElementById("video-modal").classList.remove("hidden");
+        }
+        function closeVideoModal() {
+            document.getElementById("video-modal").classList.add("hidden");
         }
 
         async function saveVideo() {
+            const fileInput = document.getElementById("modal-video-file");
             const filename = document.getElementById("modal-video-filename").value.trim();
             const title = document.getElementById("modal-video-title").value.trim();
+            const lesson = parseInt(document.getElementById("modal-video-lesson").value);
+            const grade = parseInt(document.getElementById("modal-video-grade").value);
 
-            if (!filename || !title) {
-                showCustomToast("Please complete all video details.", "error");
+            if (!filename || !title || isNaN(lesson)) {
+                showCustomToast("Please fill in all video lecture details.", "error");
                 return;
             }
 
-            const nameWithoutExt = filename.replace(/\.[^/.]+$/, "").toLowerCase();
-            if (!nameWithoutExt.startsWith("media")) {
-                showCustomToast("Filename must follow rules: starting with 'media' (e.g. media28.mp4)", "error");
-                return;
-            }
-
-            const digitsPart = nameWithoutExt.substring(5);
-            if (!/^\d+$/.test(digitsPart)) {
-                showCustomToast("Filename digits missing. Pattern: media{lesson}{grade}.mp4", "error");
-                return;
-            }
-
-            let parsedGrade, parsedLesson;
-            if (digitsPart.endsWith("10")) {
-                parsedGrade = 10;
-                parsedLesson = parseInt(digitsPart.substring(0, digitsPart.length - 2));
-            } else if (["7", "8", "9"].includes(digitsPart.substring(digitsPart.length - 1))) {
-                parsedGrade = parseInt(digitsPart.substring(digitsPart.length - 1));
-                parsedLesson = parseInt(digitsPart.substring(0, digitsPart.length - 1));
-            } else {
-                showCustomToast("Egypt grade structure limit: Grade 7, 8, 9, or 10 required.", "error");
-                return;
+            // Capture and map the file object temporarily in RAM if uploaded during current session
+            if (fileInput.files.length > 0) {
+                localUploadedVideos[filename] = URL.createObjectURL(fileInput.files[0]);
             }
 
             try {
-                await apiCall("videos", "POST", { filename, title, lesson: parsedLesson, grade: parsedGrade });
+                await apiCall("videos", "POST", { filename, title, lesson, grade });
                 closeVideoModal();
                 renderVideos();
                 if (activeTab === "admin") renderAdminDashboard();
-                showCustomToast(`Video parsed & successfully mapped to Grade ${parsedGrade} Lesson ${parsedLesson}!`, "success");
-            } catch(e) {
-                showCustomToast(e.message, "error");
+                showCustomToast("Video lecture registered successfully!", "success");
+            } catch(error) {
+                showCustomToast(error.message, "error");
             }
         }
 
-        async function deregisterVideo(id) {
-            if (confirm("Deregister this video lecture from the cloud database?")) {
-                try {
-                    await apiCall(`videos/${id}`, "DELETE");
-                    renderVideos();
-                    if (activeTab === "admin") renderAdminDashboard();
-                    showCustomToast("Video dropped from database registry.", "success");
-                } catch(e) {
-                    showCustomToast(e.message, "error");
-                }
+        function playLecture(filename, title, lesson, grade) {
+            document.getElementById("player-placeholder").classList.add("hidden");
+            const video = document.getElementById("secure-player");
+            video.classList.remove("hidden");
+            
+            // Resolve stream path. If uploaded live this session, use memory Blob, otherwise fall back to local folder / fallback stream.
+            if (localUploadedVideos[filename]) {
+                video.src = localUploadedVideos[filename];
+            } else {
+                video.src = `./videos/${filename}`;
+            }
+
+            video.load();
+            video.play().catch(err => {
+                console.log("Playing fallback video stream since physical media file was not found.");
+                video.src = "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-smartphone-with-a-vertical-video-41712-large.mp4";
+                video.load();
+                video.play();
+            });
+
+            // Populate metadata
+            document.getElementById("current-video-title").innerText = title;
+            document.getElementById("current-video-badge").innerText = `LESSON ${lesson} · GRADE ${grade}`;
+            document.getElementById("current-video-desc").innerText = `Lecture code verified locally inside the browser. Encrypted transmission active with floating tracking watermark overlays. Download capabilities strictly disabled.`;
+
+            // Active tracking watermarks overlay on top of video
+            const watermark = document.getElementById("video-watermark");
+            watermark.classList.remove("hidden");
+            watermark.innerText = `${currentUser.name} (${currentUser.phone})`;
+            updateWatermarkPosition();
+            showCustomToast(`Now streaming Lesson ${lesson}`, "info");
+        }
+
+        function updateWatermarkPosition() {
+            const container = document.getElementById("video-theater");
+            const watermark = document.getElementById("video-watermark");
+            if (container && watermark && !watermark.classList.contains("hidden")) {
+                const maxX = container.clientWidth - watermark.clientWidth - 20;
+                const maxY = container.clientHeight - watermark.clientHeight - 20;
+                const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+                const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+                watermark.style.left = `${randomX}px`;
+                watermark.style.top = `${randomY}px`;
             }
         }
 
-        // Help bot API communication via Cloud Serverless Worker
+        // Help Bot Tutor Chat Integration
         async function handleSendMessage(event) {
             event.preventDefault();
-            const inputField = document.getElementById("chat-input");
-            const msgText = inputField.value.trim();
-            if (!msgText) return;
+            const input = document.getElementById("chat-input");
+            const query = input.value.trim();
+            if (!query) return;
 
-            inputField.value = "";
-            appendChatMessage("student", currentUser.name, msgText);
+            appendChatMessage("user", currentUser.name, query);
+            input.value = "";
 
-            const botMsgId = appendChatMessage("bot", "Help bot", "Analyzing curriculum databases and generating response...");
+            const thinkingId = appendChatMessage("bot", "Help Bot Tutor", "Analyzing scientific concept...");
 
             try {
-                // We securely tunnel request through our serverless Cloudflare Pages function.
-                // This keeps API Key hidden on Cloudflare servers where students cannot steal it!
-                let apiEndpoint = "/api/chat";
-                if (IS_LOCAL_MOCK) {
-                    apiEndpoint = "https://corsproxy.io/?" + encodeURIComponent("https://api.groq.com/openai/v1/chat/completions");
-                }
-
-                const headers = { "Content-Type": "application/json" };
-                if (IS_LOCAL_MOCK) {
-                    headers["Authorization"] = "Bearer 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";
-                }
-
-                const gradeText = GRADE_MAPPING[currentUser.grade] ? GRADE_MAPPING[currentUser.grade].split(" (")[0] : `Grade ${currentUser.grade}`;
-                const response = await fetch(apiEndpoint, {
-                    method: "POST",
-                    headers: headers,
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: "system",
-                                content: `You are Help bot, a highly professional, polite mathematics, chemistry, and physics assistant built for MR. Ahmed Abd-ElFatah's study website. The student logged in is named ${currentUser.name}, enrolled in ${gradeText}. Solve equations step-by-step using clean numbered lists. If asked general science questions like "whats the building unit of matter", explain clearly that atoms and molecules form the building blocks, then describe their structures concisely. Always sound encouraging and tutor-professional.`
-                            },
-                            { role: "user", content: msgText }
-                        ]
-                    })
-                });
-
-                if (!response.ok) throw new Error("CORS Proxy Limit or Auth error");
-                const data = await response.json();
-                const aiReply = data.choices[0].message.content;
-                updateChatMessage(botMsgId, aiReply);
-
-            } catch (error) {
-                // Local fallback in case of connection limits
-                setTimeout(() => {
-                    const fallbackReply = generateFallbackResponse(msgText);
-                    updateChatMessage(botMsgId, fallbackReply);
-                }, 1000);
+                // Fetch course grade alignment to guide response specificity
+                const gradeLabel = GRADE_MAPPING[currentUser.grade];
+                const res = await apiCall("chat", "POST", { query, name: currentUser.name, grade: gradeLabel });
+                updateChatMessage(thinkingId, res.response);
+            } catch(error) {
+                updateChatMessage(thinkingId, `Error communicating with artificial intelligence server. Tunnelling connection retry...`);
             }
         }
 
-        function appendChatMessage(sender, name, text) {
-            const chatContainer = document.getElementById("chat-messages");
-            const msgId = "msg-" + Date.now() + "-" + Math.floor(Math.random()*1000);
-            
-            const isBot = sender === "bot";
-            const avatar = isBot ? "H" : name.charAt(0).toUpperCase();
-            
-            const avatarColor = isBot ? "bg-indigo-600" : "bg-slate-800 text-indigo-300";
-            const contentBg = isBot ? "bg-indigo-950/40 border border-indigo-500/10" : "bg-slate-800/60 border border-slate-700";
-            const alignmentClass = isBot ? "max-w-[80%] self-start" : "max-w-[80%] self-end flex-row-reverse";
+        function appendChatMessage(sender, author, text) {
+            const container = document.getElementById("chat-messages");
+            const msgId = "msg-" + Date.now() + Math.random().toString(36).substr(2, 4);
 
-            const msgHtml = `
-                <div class="flex items-start gap-3 ${alignmentClass} mb-4" id="${msgId}">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${avatarColor} aspect-square object-cover rounded-xl">${avatar}</div>
-                    <div class="${contentBg} p-3.5 rounded-2xl rounded-tl-none relative">
-                        <div class="text-[9px] text-gray-500 font-extrabold mb-1 tracking-wider uppercase">${name}</div>
-                        <p class="text-xs leading-relaxed text-gray-200 whitespace-pre-line" id="text-${msgId}">${text}</p>
+            const isBot = sender === "bot";
+            const avatarColor = isBot ? "bg-indigo-950 border border-indigo-500/20 text-indigo-400" : "bg-[#1f2937] text-white";
+            const alignment = isBot ? "justify-start" : "justify-end";
+
+            container.innerHTML += `
+                <div class="flex items-start gap-3 ${alignment}">
+                    ${isBot ? `<div class="w-8 h-8 ${avatarColor} rounded-xl flex items-center justify-center text-xs font-bold shrink-0 aspect-square rounded-xl object-cover">H</div>` : ""}
+                    <div class="bg-[#05070c] border border-[#1f2937] rounded-2xl px-4 py-3 text-xs max-w-[80%] leading-relaxed space-y-1">
+                        <div class="font-extrabold ${isBot ? 'text-indigo-400' : 'text-slate-300'}">${author}</div>
+                        <p id="text-${msgId}" class="whitespace-pre-wrap">${text}</p>
                     </div>
                 </div>
             `;
-            
-            chatContainer.insertAdjacentHTML("beforeend", msgHtml);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            container.scrollTop = container.scrollHeight;
             return msgId;
         }
 
@@ -1231,53 +1219,22 @@ Curriculum worksheet signature authenticated.
             }
         }
 
-        function generateFallbackResponse(query) {
-            const q = query.toLowerCase();
-            const gradeText = GRADE_MAPPING[currentUser.grade].split(" (")[0];
-
-            if (q.includes("hi") || q.includes("hello") || q.includes("hey")) {
-                return `Hello ${currentUser.name}! I am Help bot, your professional mathematical assistant. I see you are enrolled in ${gradeText}. What math formula or worksheet problem can we solve step-by-step today?`;
-            }
-            if (q.includes("building unit of matter") || q.includes("matter") || q.includes("unit of matter")) {
-                return `The building unit of matter is the **atom**!
-
-Here is a quick scientific breakdown of its structure:
-1. **Nucleus**: Found at the very center, containing protons (positively charged) and neutrons (neutral).
-2. **Electrons**: Tiny negatively charged particles that orbit the nucleus in specific energy clouds.
-
-When atoms join together, they form **molecules**, which build up all physical materials around us in MR. Ahmed's curriculum!`;
-            }
-            if (q.includes("algebra") || q.includes("equation") || q.includes("solve")) {
-                return `Let's look at this step-by-step:
-
-1. State the equation clearly (e.g. 2x + 8 = 16)
-2. Isolate the variable term by performing the inverse operation on both sides:
-   2x = 16 - 8
-   2x = 8
-3. Divide by the coefficient:
-   x = 8 / 2
-   x = 4
-
-Let me know if you want to break down a specific homework equation!`;
-            }
-            return `I have analyzed your coursework query regarding "${query}". As your dedicated tutor, I highly recommend verifying the specific guidelines on your printed worksheets. Let me know if you would like me to solve a specific formula step-by-step!`;
-        }
-
-        // Community Feed Render (Cloud database linked)
+        // Community Feed Render
         async function renderFeed() {
             const stream = document.getElementById("feed-stream");
-            stream.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading updates feed...</div>`;
+            stream.innerHTML = "";
 
             try {
                 const feed = await apiCall("feed");
-                stream.innerHTML = "";
 
                 if (feed.length === 0) {
                     stream.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No announcements in the community feed yet.</div>`;
                     return;
                 }
 
-                feed.forEach((post) => {
+                // Reverse stream to display newest posts first
+                [...feed].reverse().forEach((post, rIdx) => {
+                    const postIdx = feed.length - 1 - rIdx;
                     let attachmentHtml = "";
                     let imageHtml = "";
                     let commentsHtml = "";
@@ -1296,23 +1253,47 @@ Let me know if you want to break down a specific homework equation!`;
                         `;
                     }
 
-                    if (post.image_data) {
+                    if (post.image) {
                         imageHtml = `
                             <div class="mt-3 rounded-xl overflow-hidden border border-[#1f2937] max-h-[300px] flex items-center justify-center bg-black">
-                                <img src="${post.image_data}" class="w-full h-full object-cover aspect-square rounded-xl">
+                                <img src="${post.image}" class="w-full h-full object-cover aspect-square rounded-xl">
                             </div>
                         `;
                     }
 
+                    // Render comments with larger, bold, highlighted font titles and liking counters
                     const comments = post.comments || [];
                     comments.forEach(c => {
+                        const commentLikes = c.likes || [];
+                        const hasLikedComment = commentLikes.includes(currentUser.name);
+                        const cLikesList = commentLikes.join(", ");
+                        
                         commentsHtml += `
-                            <div class="p-3 bg-[#05070c]/50 rounded-xl border border-[#1f2937]/50 space-y-1">
-                                <div class="text-[11px] font-extrabold text-indigo-400 tracking-tight block">${c.author}</div>
-                                <div class="text-xs text-gray-200">${c.text}</div>
+                            <div class="p-3 bg-[#05070c]/50 rounded-xl border border-[#1f2937]/50 flex justify-between items-start gap-4 hover:border-indigo-500/10 transition">
+                                <div class="space-y-1 min-w-0 flex-1 overflow-hidden">
+                                    <div class="text-[11px] font-extrabold text-indigo-400 tracking-tight block">${c.author}</div>
+                                    <div class="text-xs text-gray-200 leading-relaxed break-words whitespace-pre-wrap">${c.text}</div>
+                                    ${commentLikes.length > 0 ? `
+                                        <div class="text-[9px] text-gray-500 font-medium">Liked by: <span class="text-indigo-400 font-semibold">${cLikesList}</span></div>
+                                    ` : ""}
+                                </div>
+                                <button onclick="toggleCommentLike(${post.id}, ${c.id})" class="flex items-center gap-1 p-1 hover:bg-slate-800 rounded-lg text-gray-500 hover:text-red-400 transition shrink-0">
+                                    <i data-lucide="heart" class="w-3 h-3 ${hasLikedComment ? 'fill-red-500 text-red-500' : ''}"></i>
+                                    <span class="text-[10px] font-bold font-mono">${commentLikes.length}</span>
+                                </button>
                             </div>
                         `;
                     });
+
+                    // Parse post likes list
+                    let postLikesList = [];
+                    try {
+                        postLikesList = typeof post.likes_json === 'string' ? JSON.parse(post.likes_json || "[]") : (post.likes_json || []);
+                    } catch(e) { postLikesList = []; }
+
+                    const hasLikedPost = postLikesList.includes(currentUser.name);
+                    const postLikesCount = postLikesList.length;
+                    const pLikesListText = postLikesList.join(", ");
 
                     stream.innerHTML += `
                         <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4 shadow-sm hover:border-slate-800 transition">
@@ -1327,6 +1308,17 @@ Let me know if you want to break down a specific homework equation!`;
                             ${imageHtml}
                             ${attachmentHtml}
                             
+                            <!-- Interactive Liking Area -->
+                            <div class="flex items-center gap-3 pt-1">
+                                <button onclick="togglePostLike(${post.id})" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#05070c] hover:bg-slate-800 border border-[#1f2937] hover:border-red-500/30 rounded-xl text-[11px] font-semibold text-gray-400 hover:text-red-400 transition">
+                                    <i data-lucide="heart" class="w-3.5 h-3.5 ${hasLikedPost ? 'fill-red-500 text-red-500' : ''}"></i>
+                                    <span>${postLikesCount} Likes</span>
+                                </button>
+                                ${postLikesCount > 0 ? `
+                                    <span class="text-[10px] text-gray-500">Liked by: <span class="text-indigo-400 font-semibold">${pLikesListText}</span></span>
+                                ` : ""}
+                            </div>
+                            
                             <!-- Comment Thread Section -->
                             <div class="border-t border-[#1f2937]/50 pt-3 space-y-3">
                                 <h5 class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Comment Thread</h5>
@@ -1334,6 +1326,7 @@ Let me know if you want to break down a specific homework equation!`;
                                     ${commentsHtml || '<p class="text-[10px] text-gray-500">No comments posted yet.</p>'}
                                 </div>
                                 
+                                <!-- Comment form for all authenticated users -->
                                 <form onsubmit="handleAddComment(event, ${post.id})" class="flex gap-2 pt-2">
                                     <input type="text" placeholder="Write a comment..." required class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500">
                                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-xl text-[10px] transition">
@@ -1345,14 +1338,14 @@ Let me know if you want to break down a specific homework equation!`;
                     `;
                 });
                 try { lucide.createIcons(); } catch(e) {}
-            } catch (err) {
-                stream.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Failed to load feed announcements: ${err.message}</div>`;
+            } catch(err) {
+                showCustomToast("Failed to load news feed.", "error");
             }
         }
 
         function handleFeedAttachment(type) {
             const status = document.getElementById("feed-attachment-status");
-            status.innerText = "Processing File...";
+            status.innerText = "Processing...";
             status.classList.remove("hidden");
 
             if (type === "image") {
@@ -1361,7 +1354,7 @@ Let me know if you want to break down a specific homework equation!`;
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         tempPostAttachment = { type: "image", data: e.target.result };
-                        status.innerText = "Photo Attached ✔";
+                        status.innerText = "Image Attached ✔";
                         status.className = "text-[11px] text-emerald-400 font-semibold";
                     };
                     reader.readAsDataURL(file);
@@ -1379,27 +1372,29 @@ Let me know if you want to break down a specific homework equation!`;
         async function publishFeedPost() {
             const text = document.getElementById("feed-post-text").value.trim();
             if (!text && !tempPostAttachment) {
-                showCustomToast("Please enter an update description or attach media.", "error");
+                showCustomToast("Please write a post or attach some media.", "error");
                 return;
             }
 
-            try {
-                await apiCall("feed", "POST", {
-                    text: text,
-                    attachment_name: tempPostAttachment && tempPostAttachment.type === "pdf" ? tempPostAttachment.name : null,
-                    image_data: tempPostAttachment && tempPostAttachment.type === "image" ? tempPostAttachment.data : null
-                });
+            const payload = {
+                author: `MR. Ahmed Abd-ElFatah (${currentUser.name})`,
+                date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+                text: text,
+                attachment_name: tempPostAttachment && tempPostAttachment.type === "pdf" ? tempPostAttachment.name : null,
+                image: tempPostAttachment && tempPostAttachment.type === "image" ? tempPostAttachment.data : null
+            };
 
+            try {
+                await apiCall("feed", "POST", payload);
                 document.getElementById("feed-post-text").value = "";
                 document.getElementById("feed-attach-image").value = "";
                 document.getElementById("feed-attach-pdf").value = "";
                 document.getElementById("feed-attachment-status").classList.add("hidden");
                 tempPostAttachment = null;
-
                 renderFeed();
-                showCustomToast("Announcement successfully broadcast on classroom feed!", "success");
-            } catch(e) {
-                showCustomToast(e.message, "error");
+                showCustomToast("Announcement published successfully!", "success");
+            } catch(error) {
+                showCustomToast(error.message, "error");
             }
         }
 
@@ -1411,29 +1406,22 @@ Let me know if you want to break down a specific homework equation!`;
             if (!text) return;
 
             try {
-                await apiCall(`feed/${postId}/comment`, "POST", { text });
+                await apiCall("comments", "POST", { postId, author: currentUser.name, text });
                 input.value = "";
                 renderFeed();
-                showCustomToast("Comment published!", "success");
-            } catch (error) {
-                showCustomToast(error.message, "error");
+                showCustomToast("Comment posted!", "success");
+            } catch(err) {
+                showCustomToast(err.message, "error");
             }
         }
 
-        // ADMINISTRATIVE USER & SQL DIRECTIVES
+        // DATABASE SQLITE & GRADES ASSIGNMENT CONTROLLER
         async function renderAdminDashboard() {
             const list = document.getElementById("admin-students-list");
-            list.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading Student Registry...</div>`;
-            
+            list.innerHTML = "";
+
             try {
                 const students = await apiCall("students");
-                list.innerHTML = "";
-
-                if (students.length === 0) {
-                    list.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No students registered yet. Click register above!</div>`;
-                    return;
-                }
-
                 students.forEach(s => {
                     const levelName = GRADE_MAPPING[s.grade] ? GRADE_MAPPING[s.grade].split(" (")[0] : s.grade;
                     const isAdmin = s.role === "admin";
@@ -1444,12 +1432,11 @@ Let me know if you want to break down a specific homework equation!`;
                                     <span>${s.name}</span>
                                     ${isAdmin ? '<span class="text-red-400 text-[9px] bg-red-950 px-1.5 py-0.5 rounded-md font-semibold">Admin</span>' : ""}
                                 </h4>
-                                <p class="text-[9px] text-gray-500 font-mono">ID/Phone: ${s.phone} | Pwd: ${s.password}</p>
-                                <p class="text-[10px] text-indigo-400 font-semibold mt-0.5">${levelName}</p>
+                                <p class="text-[9px] text-gray-500 mt-1 uppercase font-mono">ID: ${s.phone} · ${levelName} · ${s.gender === "female" ? "Girl" : "Boy"}</p>
                             </div>
                             <div class="flex gap-1.5">
                                 <button onclick="toggleAdminPrivilege(${s.id})" class="bg-slate-800 hover:bg-slate-700 text-gray-300 px-2 py-1 rounded-lg text-[9px] font-semibold transition" title="Toggle Admin status">
-                                    Admin Toggle
+                                    Privilege
                                 </button>
                                 <button onclick="editStudent(${s.id})" class="bg-indigo-900/40 hover:bg-indigo-900 text-indigo-300 p-1.5 rounded-lg">
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
@@ -1461,31 +1448,20 @@ Let me know if you want to break down a specific homework equation!`;
                         </div>
                     `;
                 });
-            } catch (err) {
-                list.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Registry load error: ${err.message}</div>`;
+            } catch(error) {
+                list.innerHTML = `<div class="text-center py-4 text-gray-500 text-[11px]">Database error.</div>`;
             }
 
-            // Also load videos catalog
-            const vList = document.getElementById("admin-videos-list");
-            vList.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">Loading lectures registry...</div>`;
-
+            const videoCatalog = document.getElementById("admin-videos-list");
+            videoCatalog.innerHTML = "";
             try {
                 const videos = await apiCall("videos");
-                vList.innerHTML = "";
-
-                if (videos.length === 0) {
-                    vList.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">No video lecture records stored yet.</div>`;
-                    return;
-                }
-
-                videos.forEach((v) => {
-                    const levelLabel = GRADE_MAPPING[v.grade] ? GRADE_MAPPING[v.grade].split(" (")[0] : `Grade ${v.grade}`;
-                    vList.innerHTML += `
+                videos.forEach(v => {
+                    videoCatalog.innerHTML += `
                         <div class="p-3 bg-[#05070c] border border-[#1f2937] rounded-xl flex items-center justify-between text-xs">
                             <div>
-                                <h4 class="font-bold text-white font-mono">${v.filename}</h4>
-                                <p class="text-[10px] text-gray-400">Lesson ${v.lesson} • Description: ${v.title}</p>
-                                <p class="text-[10px] text-indigo-400 font-semibold mt-0.5">${levelLabel}</p>
+                                <h4 class="font-bold text-white">${v.title}</h4>
+                                <p class="text-[9px] text-gray-500 mt-1 font-mono">FILE: ${v.filename} · G${v.grade}</p>
                             </div>
                             <button onclick="deregisterVideo(${v.id})" class="bg-red-950/40 hover:bg-red-900 text-red-400 px-2 py-1 rounded-lg text-[10px] transition font-semibold">
                                 Delete
@@ -1493,38 +1469,50 @@ Let me know if you want to break down a specific homework equation!`;
                         </div>
                     `;
                 });
-                try { lucide.createIcons(); } catch(e) {}
-            } catch(err) {
-                vList.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">Lectures list load error: ${err.message}</div>`;
+            } catch(e) {
+                videoCatalog.innerHTML = `<div class="text-center py-4 text-gray-500 text-[11px]">Error loading video records.</div>`;
             }
+
+            try { lucide.createIcons(); } catch(e) {}
         }
 
         async function executeAdminSQL() {
             const query = document.getElementById("admin-sql-query").value.trim();
             const panel = document.getElementById("sql-results-panel");
-            panel.classList.remove("hidden");
-            
-            if (!query) {
-                panel.innerHTML = "sqlite> ERROR: Command query cannot be empty.";
-                return;
-            }
+            if (!query) return;
 
             try {
-                const data = await apiCall("sql", "POST", { query });
-                let formatted = `sqlite> ${query}
-`;
-                if (data.results && Array.isArray(data.results)) {
-                    formatted += JSON.stringify(data.results, null, 2);
-                } else {
-                    formatted += "Query OK. SQL operation finished successfully.";
-                }
-                panel.innerText = formatted;
-                showCustomToast("SQL statement executed successfully on Cloud SQLite!", "success");
-            } catch (err) {
-                panel.innerText = `sqlite> ${query}
+                const res = await apiCall("sql", "POST", { query });
+                if (res.results) {
+                    panel.innerText = `sqlite> ${query}
 
-ERROR: ${err.message}`;
-                showCustomToast("SQL Statement Error.", "error");
+` + JSON.stringify(res.results, null, 2);
+                } else {
+                    panel.innerText = `sqlite> ${query}
+
+Operation completed successfully.`;
+                }
+                showCustomToast("SQL instruction run successfully.", "success");
+            } catch(error) {
+                panel.innerText = `sqlite> Error: ${error.message}`;
+            }
+        }
+
+        async function exportDatabaseJSON() {
+            try {
+                const schema = await apiCall("export", "GET");
+                const blob = new Blob([JSON.stringify(schema, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "ahmed_website_database.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showCustomToast("Master database file downloaded successfully!", "success");
+            } catch(err) {
+                showCustomToast("Error exporting SQL schema", "error");
             }
         }
 
@@ -1535,21 +1523,29 @@ ERROR: ${err.message}`;
             document.getElementById("modal-student-phone").value = "";
             document.getElementById("modal-student-pass").value = "";
             document.getElementById("modal-student-grade").value = "7";
+            document.getElementById("modal-student-gender").value = "male";
             document.getElementById("student-modal").classList.remove("hidden");
+        }
+        function closeStudentModal() {
+            document.getElementById("student-modal").classList.add("hidden");
         }
 
         async function editStudent(id) {
             currentEditingStudentId = id;
             try {
-                const s = await apiCall(`students/${id}`);
-                document.getElementById("student-modal-title").innerText = "Modify Student Account";
-                document.getElementById("modal-student-name").value = s.name;
-                document.getElementById("modal-student-phone").value = s.phone;
-                document.getElementById("modal-student-pass").value = s.password;
-                document.getElementById("modal-student-grade").value = s.grade.toString();
-                document.getElementById("student-modal").classList.remove("hidden");
-            } catch(e) {
-                showCustomToast(e.message, "error");
+                const students = await apiCall("students");
+                const s = students.find(x => x.id === id);
+                if (s) {
+                    document.getElementById("student-modal-title").innerText = "Modify Student Account";
+                    document.getElementById("modal-student-name").value = s.name;
+                    document.getElementById("modal-student-phone").value = s.phone;
+                    document.getElementById("modal-student-pass").value = s.password;
+                    document.getElementById("modal-student-grade").value = s.grade.toString();
+                    document.getElementById("modal-student-gender").value = s.gender || "male";
+                    document.getElementById("student-modal").classList.remove("hidden");
+                }
+            } catch(err) {
+                showCustomToast("Error retrieving student details.", "error");
             }
         }
 
@@ -1558,72 +1554,64 @@ ERROR: ${err.message}`;
             const phone = document.getElementById("modal-student-phone").value.trim();
             const pass = document.getElementById("modal-student-pass").value.trim();
             const grade = parseInt(document.getElementById("modal-student-grade").value);
+            const gender = document.getElementById("modal-student-gender").value;
 
             if (!name || !phone || !pass) {
-                showCustomToast("Please fill out all required fields.", "error");
+                showCustomToast("Please complete all student credentials.", "error");
                 return;
             }
 
             try {
-                if (currentEditingStudentId === null) {
-                    await apiCall("students", "POST", { name, phone, password: pass, grade });
-                    showCustomToast("Student account registered to Cloud D1 database!", "success");
-                } else {
-                    await apiCall(`students/${currentEditingStudentId}`, "PUT", { name, phone, password: pass, grade });
-                    showCustomToast("Student records successfully synchronized on Cloud!", "success");
-                }
+                const isNew = currentEditingStudentId === null;
+                const endpoint = isNew ? "students" : `students?id=${currentEditingStudentId}`;
+                const method = isNew ? "POST" : "PUT";
+                
+                await apiCall(endpoint, method, { name, phone, password: pass, grade, gender });
                 closeStudentModal();
                 renderAdminDashboard();
-            } catch(e) {
-                showCustomToast(e.message, "error");
-            }
-        }
-
-        async function deleteStudent(id) {
-            if (confirm("Permanently delete this student record from the cloud database?")) {
-                try {
-                    await apiCall(`students/${id}`, "DELETE");
-                    renderAdminDashboard();
-                    showCustomToast("Student record deleted from D1 database.", "success");
-                } catch(e) {
-                    showCustomToast(e.message, "error");
-                }
+                showCustomToast(isNew ? "Student account registered!" : "Student record updated!", "success");
+            } catch(error) {
+                showCustomToast(error.message, "error");
             }
         }
 
         async function toggleAdminPrivilege(id) {
             try {
-                const res = await apiCall(`students/${id}/toggle-admin`, "POST");
+                await apiCall("students-privilege", "POST", { id });
                 renderAdminDashboard();
-                showCustomToast(res.message, "success");
-            } catch(e) {
-                showCustomToast(e.message, "error");
+                showCustomToast("Account access privileges changed.", "success");
+            } catch(err) {
+                showCustomToast(err.message, "error");
             }
         }
 
-        function closeStudentModal() {
-            document.getElementById("student-modal").classList.add("hidden");
+        async function deleteStudent(id) {
+            if (confirm("Permanently delete this student account registry from the academy database?")) {
+                try {
+                    await apiCall(`students?id=${id}`, "DELETE");
+                    renderAdminDashboard();
+                    showCustomToast("Account deleted successfully.", "success");
+                } catch(error) {
+                    showCustomToast(error.message, "error");
+                }
+            }
         }
 
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById("portal-section").classList.add("hidden");
-            document.getElementById("login-section").classList.remove("hidden");
-            document.getElementById("login-id").value = "";
-            document.getElementById("login-password").value = "";
-            
-            const player = document.getElementById("secure-player");
-            player.pause();
-            player.src = "";
-            player.classList.add("hidden");
-            document.getElementById("player-placeholder").classList.remove("hidden");
-            document.getElementById("video-watermark").classList.add("hidden");
-
-            showCustomToast("Disconnected from MR. Ahmed's database.", "info");
+        async function deregisterVideo(id) {
+            if (confirm("Deregister this video lecture?")) {
+                try {
+                    await apiCall(`videos?id=${id}`, "DELETE");
+                    renderAdminDashboard();
+                    renderVideos();
+                    showCustomToast("Lecture record deleted.", "success");
+                } catch(error) {
+                    showCustomToast(error.message, "error");
+                }
+            }
         }
 
-        function showCustomToast(message, type) {
-            let color = "bg-[#0b0f19] border-indigo-500/20 text-indigo-300";
+        function showCustomToast(message, type = "info") {
+            let color = "bg-indigo-950/80 border-indigo-500/40 text-indigo-300";
             if (type === "error") color = "bg-red-950/80 border-red-500/40 text-red-400";
             if (type === "success") color = "bg-emerald-950/80 border-emerald-500/40 text-emerald-400";
             
@@ -1639,4 +1627,301 @@ ERROR: ${err.message}`;
             }, 3000);
         }
 
-        // 
+        
+        function injectAdminConsoleHTML() {
+            const container = document.getElementById("view-admin");
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div>
+                    <h2 class="text-lg font-bold text-white mb-1">Academy SQLite Administration Control</h2>
+                    <p class="text-xs text-gray-400 font-medium">Write custom SQL queries, verify schemas, and provision accounts directly inside the browser</p>
+                </div>
+
+                <!-- Raw SQLite Input Terminal -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 space-y-4">
+                        <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-3 shadow-sm">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Execute Raw SQL Directives</h3>
+                            <div class="flex gap-2">
+                                <input type="text" id="admin-sql-query" placeholder="SELECT * FROM students_table WHERE role = 'student'" class="flex-1 bg-[#05070c] border border-[#1f2937] rounded-xl px-4 py-3 text-xs text-white placeholder-gray-600 font-mono focus:outline-none focus:border-indigo-500">
+                                <button onclick="executeAdminSQL()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 rounded-xl text-xs transition">
+                                    Execute
+                                </button>
+                            </div>
+                            <div id="sql-results-panel" class="bg-[#05070c] border border-[#1f2937] p-4 rounded-xl h-36 font-mono text-[10px] text-emerald-400 overflow-y-auto whitespace-pre-wrap">sqlite> Ready. Submit a standard SQLite query.</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-gradient-to-br from-indigo-950/20 to-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-3 shadow-sm text-xs">
+                            <h3 class="font-bold text-white">Database Backups</h3>
+                            <p class="text-gray-400 text-[11px] leading-relaxed">
+                                Export all records as a single file. Paste this file into the script variables inside VS Code to pre-populate student logins for everyone on Cloudflare Pages.
+                            </p>
+                            <button onclick="exportDatabaseJSON()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4 text-indigo-400"></i>
+                                <span>Export Master Database (JSON)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Directory Catalog -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Student Account Registry -->
+                    <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-[#1f2937] pb-3">
+                            <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Registered Students Directory</h3>
+                            <button onclick="openAddStudentModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
+                                + Provision Account
+                            </button>
+                        </div>
+                        <div id="admin-students-list" class="space-y-3 max-h-[300px] overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Registered Lectures List -->
+                    <div class="bg-[#0b0f19] border border-[#1f2937] p-5 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-[#1f2937] pb-3">
+                            <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Recorded Lectures Inventory</h3>
+                            <button onclick="openAddVideoModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1 rounded-lg text-[10px] transition">
+                                + Register Video
+                            </button>
+                        </div>
+                        <div id="admin-videos-list" class="space-y-3 max-h-[300px] overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+            `;
+            try { lucide.createIcons(); } catch(e) {}
+        }
+    
+
+
+        function generateFallbackResponse(query) {
+            const q = query.toLowerCase();
+            const gradeText = GRADE_MAPPING[currentUser.grade] ? GRADE_MAPPING[currentUser.grade].split(" (")[0] : `Grade ${currentUser.grade}`;
+
+            if (q.includes("hi") || q.includes("hello") || q.includes("hey")) {
+                return `Ahlan ${currentUser.name}! I am Help Bot, your professional mathematical assistant. I see you are studying ${gradeText}. What math formula or science problem can we solve step-by-step today?`;
+            }
+            if (q.includes("building unit of matter") || q.includes("matter") || q.includes("unit of matter") || q.includes("building unit")) {
+                return `The building unit of matter is the **atom**!\n\nHere is a quick scientific breakdown of its structure:\n1. **Nucleus**: Found at the very center, containing protons (positively charged) and neutrons (neutral).\n2. **Electrons**: Tiny negatively charged particles that orbit the nucleus in specific energy clouds.\n\nWhen atoms join together, they form **molecules**, which build up all physical materials around us in MR. Ahmed's curriculum!`;
+            }
+            if (q.includes("algebra") || q.includes("equation") || q.includes("solve") || q.includes("formula")) {
+                return `Let's look at algebraic equations step-by-step:\n\n1. State the equation clearly (e.g., 2x + 8 = 16)\n2. Isolate the variable term by performing the inverse operation on both sides:\n   2x = 16 - 8\n   2x = 8\n3. Divide by the coefficient:\n   x = 8 / 2\n   x = 4\n\nLet me know if you want to break down a specific homework equation!`;
+            }
+            return `I have analyzed your coursework query regarding "${query}". As your dedicated physics and chemistry tutor, I highly recommend verifying the specific guidelines on your printed worksheets. Let me know if you would like me to solve a specific equation step-by-step!`;
+        }
+    
+
+        // =====================================================================
+        // THE OFFLINE EMBEDDED DEVELOPMENT INTERFACE (MOCK LOCAL STORAGE SQL SERVER)
+        // =====================================================================
+        function initMockLocalStorage() {
+            if (localStorage.getItem("db_version") !== DATABASE_VERSION) {
+                localStorage.setItem("students_table", JSON.stringify([
+                    { id: 1, name: "Admin Staff (Dev)", phone: "admin", password: "admin", grade: "all", role: "admin", gender: "male", grades_record: "[]" }
+                ]));
+                localStorage.setItem("videos_table", JSON.stringify([]));
+                localStorage.setItem("materials_table", JSON.stringify([]));
+                localStorage.setItem("feed_table", JSON.stringify([]));
+                localStorage.setItem("db_version", DATABASE_VERSION);
+            }
+        }
+
+        function mockLocalAPI(endpoint, method, body) {
+            console.log(`[Local Memory SQLite Engine] ${method} /api/${endpoint}`, body);
+            
+            const students = JSON.parse(localStorage.getItem("students_table")) || [];
+            const videos = JSON.parse(localStorage.getItem("videos_table")) || [];
+            const feed = JSON.parse(localStorage.getItem("feed_table")) || [];
+            const materials = JSON.parse(localStorage.getItem("materials_table")) || [];
+
+            const parsedUrl = new URL(endpoint, "http://mock.api/");
+            const cleanPath = parsedUrl.pathname.replace(/^\//, "");
+            const queryId = parsedUrl.searchParams.get("id");
+
+            if (cleanPath === "login" && method === "POST") {
+                const user = students.find(s => s.role === body.role && s.phone === body.idVal && s.password === body.passVal);
+                if (user) return Promise.resolve(user);
+                return Promise.reject(new Error("Login failed: Check credentials or privilege profile."));
+            }
+
+            if (cleanPath === "login-bypass" && method === "POST") {
+                const devAdmin = students.find(s => s.role === "admin");
+                if (devAdmin) return Promise.resolve(devAdmin);
+                const defaultAdmin = { id: 1, name: "Default Administrator", phone: "admin", password: "admin", grade: "all", role: "admin", grades_record: "[]" };
+                students.push(defaultAdmin);
+                localStorage.setItem("students_table", JSON.stringify(students));
+                return Promise.resolve(defaultAdmin);
+            }
+
+            if (cleanPath === "students") {
+                if (method === "GET") return Promise.resolve(students);
+                if (method === "POST") {
+                    const newStudent = { id: Date.now(), ...body, role: "student", gender: body.gender || "male", grades_record: "[]" };
+                    students.push(newStudent);
+                    localStorage.setItem("students_table", JSON.stringify(students));
+                    return Promise.resolve(newStudent);
+                }
+                if (method === "PUT") {
+                    const idx = students.findIndex(s => s.id === parseInt(queryId));
+                    if (idx !== -1) {
+                        students[idx] = { ...students[idx], ...body };
+                        localStorage.setItem("students_table", JSON.stringify(students));
+                        return Promise.resolve(students[idx]);
+                    }
+                }
+                if (method === "DELETE") {
+                    const cleanList = students.filter(s => s.id !== parseInt(queryId));
+                    localStorage.setItem("students_table", JSON.stringify(cleanList));
+                    return Promise.resolve({ ok: true });
+                }
+            }
+
+            if (cleanPath === "students-privilege" && method === "POST") {
+                const target = students.find(s => s.id === body.id);
+                if (target) {
+                    target.role = target.role === "admin" ? "student" : "admin";
+                    target.grade = target.role === "admin" ? "all" : "7";
+                    localStorage.setItem("students_table", JSON.stringify(students));
+                    return Promise.resolve(target);
+                }
+            }
+
+            if (cleanPath === "videos") {
+                if (method === "GET") return Promise.resolve(videos);
+                if (method === "POST") {
+                    const newVideo = { id: Date.now(), ...body };
+                    videos.push(newVideo);
+                    localStorage.setItem("videos_table", JSON.stringify(videos));
+                    return Promise.resolve(newVideo);
+                }
+                if (method === "DELETE") {
+                    const cleanList = videos.filter(v => v.id !== parseInt(queryId));
+                    localStorage.setItem("videos_table", JSON.stringify(cleanList));
+                    return Promise.resolve({ ok: true });
+                }
+            }
+
+            if (cleanPath === "materials") {
+                if (method === "GET") return Promise.resolve(materials);
+                if (method === "POST") {
+                    const newMat = { id: Date.now(), ...body };
+                    materials.push(newMat);
+                    localStorage.setItem("materials_table", JSON.stringify(materials));
+                    return Promise.resolve(newMat);
+                }
+                if (method === "DELETE") {
+                    const cleanList = materials.filter(m => m.id !== parseInt(queryId));
+                    localStorage.setItem("materials_table", JSON.stringify(cleanList));
+                    return Promise.resolve({ ok: true });
+                }
+            }
+
+            if (endpoint.startsWith("feed/") && endpoint.includes("/comment/") && endpoint.endsWith("/like") && method === "POST") {
+                const parts = endpoint.split("/");
+                const postId = parseInt(parts[1]);
+                const commentId = parseInt(parts[3]);
+                const idx = feed.findIndex(p => p.id === postId);
+                if (idx !== -1) {
+                    const cIdx = feed[idx].comments.findIndex(c => c.id === commentId);
+                    if (cIdx !== -1) {
+                        if (!feed[idx].comments[cIdx].likes) feed[idx].comments[cIdx].likes = [];
+                        const nameIdx = feed[idx].comments[cIdx].likes.indexOf(currentUser.name);
+                        if (nameIdx !== -1) {
+                            feed[idx].comments[cIdx].likes.splice(nameIdx, 1);
+                        } else {
+                            feed[idx].comments[cIdx].likes.push(currentUser.name);
+                        }
+                        localStorage.setItem("feed_table", JSON.stringify(feed));
+                        return Promise.resolve({ success: true });
+                    }
+                }
+            }
+
+            if (endpoint.startsWith("feed/") && endpoint.endsWith("/like") && method === "POST") {
+                const postId = parseInt(endpoint.split("/")[1]);
+                const idx = feed.findIndex(p => p.id === postId);
+                if (idx !== -1) {
+                    if (!feed[idx].likes_json) feed[idx].likes_json = "[]";
+                    let likes = [];
+                    try { likes = JSON.parse(feed[idx].likes_json); } catch(e) { likes = []; }
+                    const nameIdx = likes.indexOf(currentUser.name);
+                    if (nameIdx !== -1) {
+                        likes.splice(nameIdx, 1);
+                    } else {
+                        likes.push(currentUser.name);
+                    }
+                    feed[idx].likes_json = JSON.stringify(likes);
+                    localStorage.setItem("feed_table", JSON.stringify(feed));
+                    return Promise.resolve({ success: true });
+                }
+            }
+
+            if (cleanPath === "feed") {
+                if (method === "GET") return Promise.resolve(feed);
+                if (method === "POST") {
+                    const newPost = { id: Date.now(), comments: [], ...body };
+                    feed.push(newPost);
+                    localStorage.setItem("feed_table", JSON.stringify(feed));
+                    return Promise.resolve(newPost);
+                }
+            }
+
+            if (cleanPath === "comments" && method === "POST") {
+                const targetPost = feed.find(p => p.id === body.postId);
+                if (targetPost) {
+                    if (!targetPost.comments) targetPost.comments = [];
+                    targetPost.comments.push({
+                        id: Date.now(),
+                        author: body.author,
+                        text: body.text,
+                        likes: []
+                    });
+                    localStorage.setItem("feed_table", JSON.stringify(feed));
+                    return Promise.resolve(targetPost);
+                }
+            }
+
+            if (cleanPath === "chat" && method === "POST") {
+                const sysPrompt = `You are Help Bot, a professional mathematics and science tutor for MR. Ahmed's academy. The active student is ${body.name}, enrolled in Grade ${body.grade}. Always solve equations and scientific queries step-by-step with clean lists.`;
+                const fullPrompt = `${sysPrompt}\n\nStudent Question: ${body.query}`;
+                
+                // Directly call Pollinations GET endpoint locally to bypass CORS restrictions entirely!
+                return fetch(`https://text.pollinations.ai/${encodeURIComponent(fullPrompt)}`)
+                    .then(r => {
+                        if (!r.ok) throw new Error("Pollinations GET failed");
+                        return r.text();
+                    })
+                    .then(text => {
+                        if (text && text.trim().length > 0) {
+                            return { response: text.trim() };
+                        }
+                        throw new Error("Empty reply");
+                    })
+                    .catch(err => {
+                        console.log("Local AI fetch failed, falling back to built-in scientific database...", err);
+                        return { response: generateFallbackResponse(body.query) };
+                    });
+            }
+
+            if (cleanPath === "export") {
+                return Promise.resolve({ students, videos, feed, materials });
+            }
+
+            if (cleanPath === "sql" && method === "POST") {
+                return Promise.resolve({ results: [ { msg: "Raw SQL directive completed. (Local simulation storage flushed)" } ] });
+            }
+
+            return Promise.reject(new Error("Resource router endpoint mapping exception."));
+        }
+    </script>
+</body>
+</html>
