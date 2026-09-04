@@ -133,6 +133,7 @@ export async function onRequest(context) {
             const parts = path.split("/");
             const postId = parseInt(parts[1]);
             const commentId = parseInt(parts[3]);
+            const body = await request.json();
 
             const post = await env.DB.prepare("SELECT * FROM feed_table WHERE id = ?").bind(postId).first();
             if (post) {
@@ -144,11 +145,11 @@ export async function onRequest(context) {
                 const cIdx = comments.findIndex(c => c.id === commentId);
                 if (cIdx !== -1) {
                     if (!comments[cIdx].likes) comments[cIdx].likes = [];
-                    const nameIdx = comments[cIdx].likes.indexOf(currentUser.name);
+                    const nameIdx = comments[cIdx].likes.indexOf(body.name);
                     if (nameIdx !== -1) {
                         comments[cIdx].likes.splice(nameIdx, 1);
                     } else {
-                        comments[cIdx].likes.push(currentUser.name);
+                        comments[cIdx].likes.push(body.name);
                     }
 
                     await env.DB.prepare("UPDATE feed_table SET comments_json = ? WHERE id = ?").bind(
