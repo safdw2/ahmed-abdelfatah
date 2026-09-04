@@ -543,7 +543,7 @@
     
         async function togglePostLike(postId) {
             try {
-                await apiCall(`feed/${postId}/like`, "POST");
+                await apiCall(`feed/${postId}/like`, "POST", { name: currentUser.name });
                 renderFeed();
                 showCustomToast("Feed updated!", "success");
             } catch(err) {
@@ -553,7 +553,7 @@
 
         async function toggleCommentLike(postId, commentId) {
             try {
-                await apiCall(`feed/${postId}/comment/${commentId}/like`, "POST");
+                await apiCall(`feed/${postId}/comment/${commentId}/like`, "POST", { name: currentUser.name });
                 renderFeed();
                 showCustomToast("Comment updated!", "success");
             } catch(err) {
@@ -587,11 +587,21 @@
 
             try {
                 const response = await fetch(`/api/${endpoint}`, options);
-                if (!response.ok) {
-                    const errObj = await response.json();
-                    throw new Error(errObj.error || "Internal Cloud API Error");
+                const responseText = await response.text();
+                
+                let data = null;
+                if (responseText) {
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (e) {
+                        throw new Error(`Server returned non-JSON response: ${responseText.slice(0, 150)}`);
+                    }
                 }
-                return await response.json();
+
+                if (!response.ok) {
+                    throw new Error((data && data.error) || `Internal Cloud Error (Status ${response.status})`);
+                }
+                return data;
             } catch (error) {
                 console.error("API call failed:", error);
                 throw error;
